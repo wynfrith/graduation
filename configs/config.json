@@ -1,8 +1,11 @@
 {
+
   "port": 8080,
 
   "database":{
     "url": "mongodb://localhost/qa",
     "options": {}
-  }
+  },
+
+  "debug": true
 }

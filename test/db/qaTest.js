@@ -27,6 +27,7 @@ describe('test qa collection', () => {
   it('should create a Question', (done) => {
     var question = new Qa({
       authorId: wynfrith._id,
+      authorName: wynfrith.username,
       type: true,
       title: '我来提出一个问题',
       content: '问题正文问题正文问题正文问题正文问题正文问题正文问题正文问题正文问题正文问题正文问题正文问题正文问题正文',
@@ -44,6 +45,7 @@ describe('test qa collection', () => {
     Qa.findOne({type: true}, function(err, question) {
       var answer = new Qa({
         authorId: wynfrith._id,
+        authorName: wynfrith.username,
         questionId: question._id,
         type: false,
         content: '这个问题还在么，现在应该已经可以了吧',

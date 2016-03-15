@@ -7,9 +7,12 @@ var Schema = mongoose.Schema,
 var QaSchema = new Schema({
   id: { type: ObjectId },
   authorId: { type: ObjectId },
-  questionId: { type: ObjectId }, // answer此值缺省
+  authorName: { type: String },
+  questionId: { type: ObjectId }, // question此值缺省
   type: { type: Boolean }, // true 问题, false 答案
-  title: { type: String }, // answer此值缺省
+  title: {
+    type: String,
+   }, // answer此值缺省
   content: String,
   tags: Array, // answer此值缺省
   ups: [{

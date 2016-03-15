@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{question.title}}</title>
+</head>
+<body>
+  <h3>问题详情</h3>
+  <h4>{{question.title}}</h4>
+  <span>发布人: {{question.authorName}}</span>
+  <span>tags:
+    {% for tag in tags %}
+      {{ tag }} &nbsp;&nbsp;
+    {% endfor %}
+  </span>
+  <p>
+    {{ question.content }}
+  </p>
+
+</body>
+</html>

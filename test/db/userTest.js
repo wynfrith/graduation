@@ -17,7 +17,7 @@ describe('test user', () => {
   it('should create a user', (done) => {
     var user = new User({
       username: 'wynfrith',
-      email: 'wangfucheng56gmail.com',
+      email: 'wangfucheng56@gmail.com',
       phoneNumber: '18369905318',
       avatorAddress: 'http://my-ghost.b0.upaiyun.com/avator.jpg',
       brief: '个人简介',

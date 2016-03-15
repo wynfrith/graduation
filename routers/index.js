@@ -24,6 +24,7 @@ const routes = function (app) {
   app.use(route.get('/q/:qid', QaCtrl.question))
   app.use(route.get('/ask', function* () { yield this.render('ask') }))
   app.use(route.post('/ask', QaCtrl.ask))
+  app.use(route.post('/answer', QaCtrl.answer))
 
   // json test
   app.use(route.get('/json', function*() { this.body = { json: true }}))

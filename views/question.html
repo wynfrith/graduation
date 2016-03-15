@@ -16,6 +16,26 @@
   <p>
     {{ question.content }}
   </p>
+<hr>
+    <h3>回答</h3>
+
+    {% for answer in answers %}
+      <p>{{ answer.content}}</p>
+      <p>回答人: {{answer.authorName}}</p>
+    {% endfor%}
+
+
+  <br>
+  <hr>
+  <h3>撰写答案</h3>
+  <form action="/answer" method="post">
+    <input type="hidden" name="qid" value="{{question._id}}">
+    <textarea name="content" rows="10" cols="50">
+
+    </textarea>
+    <br>
+    <input type="submit" value="提交答案">
+  </form>
 
 </body>
 </html>

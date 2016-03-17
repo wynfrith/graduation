@@ -14,7 +14,7 @@ var QaSchema = new Schema({
     type: String,
    }, // answer此值缺省
   content: String,
-  tags: Array, // answer此值缺省
+  tags: Array, // answer此值缺省, 存放tags name
   ups: [{
     _id: '',
     upType: Boolean,  // true +1, false -1

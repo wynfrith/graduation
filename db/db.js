@@ -14,7 +14,9 @@ mongoose.connect(config.database.url, config.database.options, function(err) {
 require('./User.js')
 require('./Comment.js')
 require('./Qa.js')
+require('./Tag.js')
 
 exports.User = mongoose.model('User');
 exports.Comment = mongoose.model('Comment');
 exports.Qa = mongoose.model('Qa');
+exports.Tag = mongoose.model('Tag');

@@ -7,6 +7,9 @@ const userService = {
     } else {
       return yield db.User.findOne({ isDel: false, email: username });
     }
+  },
+  getUserById: function* (uid) {
+    return yield db.User.findOne({ isDel: false, _id: uid});
   }
 
 }

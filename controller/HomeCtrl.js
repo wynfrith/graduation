@@ -2,9 +2,10 @@ const ValidationError = require('mongoose').Error.ValidationError;
 
 const db = require('../db/db.js');
 const logger = require('../utils/logger.js')
-const userService = require('../service/userService.js')
+const cfg = require('../configs/config.json')
 const status = require('../configs/status.js')
-
+const cookieEncode = require('../utils/cookieUtil.js').cookieEncode;
+const userService = require('../service/userService.js')
 
 const User = db.User;
 const Qa= db.Qa;
@@ -12,9 +13,10 @@ const Qa= db.Qa;
 const HomeCtrl = {};
 
 HomeCtrl.index = function*() {
+  console.log(this.session);
   const questions = yield Qa.find({type: true}).sort({ createdAt: -1 }).limit(20);
   logger.debug(questions)
-  yield this.render('index', { questions: questions })
+  yield this.render('index', { questions: questions, curruser: this.session.curruser })
 }
 
 HomeCtrl.login = function* () {
@@ -34,14 +36,19 @@ HomeCtrl.login = function* () {
     avatorAddress: user.avatorAddress,
     _id: user._id,
   }
+
+  // cookie
+  if(form.remember) {
+    const token = cookieEncode(JSON.stringify(user._id));
+    this.cookies.set('token', token, { expires: new Date(Date.now() + cfg.cookie.expiredTime) })
+  }
   // add to global
-  this.render.env.addGlobal('curruser', this.session.curruser)
   return this.body = { code: 0, msg: 'success' }
 }
 
 HomeCtrl.logout = function* () {
-  this.render.env.addGlobal('curruser', null);
   this.session = null;
+  this.cookies.set('token', null);
   this.redirect('/')
 }
 

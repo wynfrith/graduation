@@ -14,6 +14,7 @@ const routes = require('./routers/index.js')
 const db = require('./db/db.js')
 const logger = require('./utils/logger.js')
 
+const auth = require('./middlewares/auth.js')
 
 app = koa()
 app.keys = ['wynfrith'];
@@ -40,6 +41,7 @@ if (cfg.debug) {
 // middleware
 app.use(morgan.middleware('dev'))
 app.use(session(app))
+app.use(auth({}))
 app.use(serve(path.join(__dirname, './public')))
 app.use(bodyparser())
 app.use(json())

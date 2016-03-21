@@ -7,5 +7,12 @@
     "options": {}
   },
 
+  "cookie": {
+    "expiredTime": 86400000,
+    "key": "C2M143COc2nCET4zBbtR9RIwpm5ljv8FgQKnq6Ay9OokXi1cC77z3887HL9veiD8",
+    "algorithm": "aes-256-cbc",
+    "symbol": "§"
+  },
+
   "debug": true
 }

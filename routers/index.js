@@ -26,8 +26,10 @@ const routes = function (app) {
   app.use(route.post('/ask', QaCtrl.ask))
   app.use(route.post('/answer', QaCtrl.answer))
 
-  // json test
+  // test
   app.use(route.get('/json', function*() { this.body = { json: true }}))
+  app.use(route.get('/auth', function*() { this.body = '您已登陆'}))
+
 
 }
 

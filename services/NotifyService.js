@@ -28,5 +28,5 @@ const NotifyService = {
    * @param notifyId
    */
   readNotify:(userId, notifyId) => {}
-}
+};
 export default NotifyService;

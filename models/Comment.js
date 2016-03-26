@@ -5,6 +5,7 @@ import timestamp from 'mongoose-timestamp'
 const Schema = mongoose.Schema,
   ObjectId = Schema.ObjectId;
 
+// TODO: Comment完全可以合并到Qa表中
 const CommentSchema = new Schema({
   id: { type: ObjectId },
   author: { type: String },

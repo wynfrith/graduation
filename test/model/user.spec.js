@@ -22,10 +22,10 @@ describe ('test user', () => {
       role: 'admin',
       username: 'wynfrith',
       email: 'wangfucheng56@gmail.com',
-      photoAddress: 'http://my-ghost.b0.upaiyun.com/avator.jpg',
-      brief: '个人简介',
       password: 'wfc5582563',
       info: {
+        brief: '个人简介',
+        photoAddress: 'http://my-ghost.b0.upaiyun.com/avator.jpg',
         phoneNumber: '18369905318',
         birthday: new Date(1994, 1, 25),
         schoolName: '山东理工大学',

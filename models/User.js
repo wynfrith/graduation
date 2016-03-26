@@ -5,7 +5,7 @@ const Schema = mongoose.Schema,
   ObjectId = Schema.ObjectId;
 
 const UserSchema = new Schema({
-  role: {
+  role: { //不允许修改
     type: String,
     require: true,
     default: 'user', // [admin, user]
@@ -33,10 +33,10 @@ const UserSchema = new Schema({
   isActive: { type: Boolean, default: true },
   isBan: { type: Boolean, default: false },
   isDel: { type: Boolean, default: false },
-  photoAddress: String,
-  brief: String,
   // skill_tags: Array,
   info: {
+    photoAddress: String,
+    brief: String,
     phoneNumber: String,
     birthday: Date,
     schoolName: String,

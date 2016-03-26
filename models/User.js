@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import timestamp from 'mongoose-timestamp'
+import uniqueValidator from 'mongoose-unique-validator'
 
 const Schema = mongoose.Schema,
   ObjectId = Schema.ObjectId;
@@ -13,13 +14,17 @@ const UserSchema = new Schema({
   },
   email: {
     type: String,
-    unique: true,
+    unique: '邮箱已存在',
     required: [true, '请输入邮箱'],
-    maxlength: [50, '您的邮箱太长了...']
+    maxlength: [50, '您的邮箱太长了...'],
+    validate: {
+      validator: (v) => /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(v),
+      message: '您的邮箱不合法'
+    }
   },
   username: {
     type: String,
-    unique: true,
+    unique: '用户名已存在',
     required: [true, '请输入用户名'],
     minlength: [2, '用户名最短为2位'],
     maxlength: [20, '用户名最长为20位']
@@ -51,6 +56,7 @@ const UserSchema = new Schema({
 
 
 UserSchema.plugin(timestamp);
+UserSchema.plugin(uniqueValidator);
 UserSchema.set('toJSON', {transform(doc, ret) { delete ret.password; }});
 
 export default mongoose.model('User', UserSchema);

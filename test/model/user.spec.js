@@ -6,9 +6,10 @@ const assert = chai.assert;
 
 // async function add(a, b) => { return a+b }
 
-describe ('test user', () => {
-  
+describe('test user', () => {
+
   before(async () => {
+    mongoose.set('debug', true);
     mongoose.connect('mongodb://localhost/newQA');
     await User.remove({})
   });
@@ -72,17 +73,26 @@ describe ('test user', () => {
     let user1 = new User({
       _id: '000000000000000000000002',
       username: 'yangtao', email: 'yangtao@123.com', password: '1234567'
+      
     });
     let user2 = new User({
       _id: '000000000000000000000003',
-      username: '泽仰', email: 'zeyang@123.com', password: '1234567' 
+      username: '泽仰', email: 'zeyang@123.com', password: '1234567',
+      info: { phoneNumber: '18669795487', brief: '呵呵呵'}
     });
     let user3 = new User({
       _id: '000000000000000000000004',
       username: 'xiaoheng', email: 'xiaoheng@123.com', password: '1234567'
     });
+    let user4 = new User({
+      _id: '000000000000000000000005',
+      username: 'deleteduser',
+      email: '1231313@1212.com',
+      password: '1234567',
+      isDel: true
+    });
     try {
-      await Promise.all([user1.save(), user2.save(), user3.save()]);
+      await Promise.all([user1.save(), user2.save(), user3.save(), user4.save()]);
     } catch (err) {
       throw err;
     }

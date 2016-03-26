@@ -4,4 +4,5 @@ test:
 		--compilers js:babel-register \
 		--harmony \
 		--reporter nyan \
+		--require should \
 		test/**/*.js

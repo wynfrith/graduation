@@ -18,6 +18,7 @@ describe ('test user', () => {
   it('should create a user', async () => {
     // assert(await add(1, 2), 3);
     let user = new User({
+      _id: '000000000000000000000001',
       role: 'admin',
       username: 'wynfrith',
       email: 'wangfucheng56@gmail.com',
@@ -68,9 +69,18 @@ describe ('test user', () => {
   });
   
   it('create users', async () => {
-    let user1 = new User({ username: 'yangtao', email: 'yangtao@123.com', password: '1234567' });
-    let user2 = new User({ username: '泽仰', email: 'zeyang@123.com', password: '1234567' });
-    let user3 = new User({ username: 'xiaoheng', email: 'xiaoheng@123.com', password: '1234567' });
+    let user1 = new User({
+      _id: '000000000000000000000002',
+      username: 'yangtao', email: 'yangtao@123.com', password: '1234567'
+    });
+    let user2 = new User({
+      _id: '000000000000000000000003',
+      username: '泽仰', email: 'zeyang@123.com', password: '1234567' 
+    });
+    let user3 = new User({
+      _id: '000000000000000000000004',
+      username: 'xiaoheng', email: 'xiaoheng@123.com', password: '1234567'
+    });
     try {
       await Promise.all([user1.save(), user2.save(), user3.save()]);
     } catch (err) {

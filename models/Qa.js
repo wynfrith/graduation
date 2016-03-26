@@ -8,6 +8,7 @@ const Schema = mongoose.Schema,
 const QaSchema = new Schema({
   id: { type: ObjectId },
   author: { type: String },
+  authorId: {type: ObjectId },
   questionId: { type: ObjectId }, // question此值缺省
   type: { type: Boolean }, // true 问题, false 答案
   title: {

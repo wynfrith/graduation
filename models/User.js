@@ -5,7 +5,6 @@ const Schema = mongoose.Schema,
   ObjectId = Schema.ObjectId;
 
 const UserSchema = new Schema({
-  id: ObjectId,
   role: {
     type: String,
     require: true,

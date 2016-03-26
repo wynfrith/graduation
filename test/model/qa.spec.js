@@ -28,6 +28,7 @@ describe ('test qa', () => {
     let koaTag = await Tag.findOne({name: 'koa'});
     
     let question = new Qa({
+      authorId: user._id,
       author: user.username,
       type: true,
       title: '我来提出一个问题',
@@ -47,12 +48,13 @@ describe ('test qa', () => {
   });
 
   it('should create a answer', async () => {
-    let zeyang = await User.findOne({ username: '泽仰'});
+    let yangtao = await User.findOne({ username: 'yangtao'});
     let question = await Qa.findOne({type: true});
     
     //create answer
     let answer = new Qa({
-      author: zeyang.username,
+      authorId: yangtao._id,
+      author: yangtao.username,
       questionId: question._id,
       title: question.title,
       type: false,
@@ -64,10 +66,11 @@ describe ('test qa', () => {
     // 同时产生了一条通知
     let announce = new Notify({
       type: 'remind',
-      sender: zeyang.username,
+      sender: yangtao.username,
       target: question._id,
       targetName: question.title,
       targetType: 'question',
+      receiver:  question.authorId,
       action: 'answer'
     });
     
@@ -75,7 +78,7 @@ describe ('test qa', () => {
       answer = await answer.save();
       announce = await announce.save();
       assert.equal(answer.score, -2);
-      assert.equal(announce.sender, '泽仰');
+      assert.equal(announce.sender, 'yangtao');
       assert.equal(announce.target, question._id);
     } catch (err) {
       throw err;

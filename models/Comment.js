@@ -7,6 +7,7 @@ const Schema = mongoose.Schema,
 
 const CommentSchema = new Schema({
   id: { type: ObjectId },
+  author: { type: String },
   authorId: { type: ObjectId },
   qaId: { type: ObjectId },
   content: { type: String },

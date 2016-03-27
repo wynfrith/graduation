@@ -1,6 +1,5 @@
 import User from "../models/User";
-import {SaveError} from "../utils/error";
-import {Ok} from "../utils/error";
+import {SaveError, Ok, NotFoundError} from "../utils/error";
 /**
  * Created by wyn on 3/25/16.
  */
@@ -51,7 +50,7 @@ const UserService = {
     try { 
       let user = await User.findOneAndUpdate(
         {isDel: false, _id: uid}, { info: info },{runValidators: true});
-      return Ok(user);
+      return !!user ? Ok(user) : NotFoundError();
     } catch (err) {
       return SaveError(err);
     }
@@ -61,7 +60,7 @@ const UserService = {
     try {
       let user = await User.findOneAndUpdate(
         {isDel:false, _id: uid}, { password: password }, {runValidators: true});
-      return Ok(user);
+      return !!user ? Ok(user) : NotFoundError();
     } catch (err) {
       return SaveError(err)
     }
@@ -71,7 +70,7 @@ const UserService = {
     try {
       let user = await User.findOneAndUpdate(
         {isDel: false, _id: uid}, { isDel: true });
-      return Ok(user);
+      return !!user ? Ok(user) : NotFoundError();
     } catch (err) {
       return SaveError(err);
     }
@@ -80,7 +79,7 @@ const UserService = {
   deleteUserForce: async (uid) => {
     try {
       let user = await User.findOneAndRemove({_id: uid});
-      return Ok(user);
+      return !!user ? Ok(user) : NotFoundError();
     } catch (err) {
       return SaveError(err);
     }

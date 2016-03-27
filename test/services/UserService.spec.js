@@ -52,24 +52,24 @@ describe.only('user service', () => {
     it('should register success', async function () {
       let user = { username: 'helloworld', password: '1234567', email:'helloworld@126.com' };
       let res = await  UserService.register(user);
-      res.code.should.be.ok();
+      res.code.should.equal(0);
       res.data.should.have.property('role', 'user');
       
       res = await UserService.deleteUserForce(res.data._id);
-      res.code.should.be.ok();
+      res.code.should.equal(0);
       res.data.should.have.property('username', 'helloworld');
     });
     
     it('should get a user exist error', async function() {
       let user = { username: 'wynfrith', password: '1234567', email:'wangfucheng56@gmail.com' };
       let res = await UserService.register(user);
-      res.code.should.be.not.ok();
+      res.code.should.not.equal(0);
       res.errors.should.have.length(2);
     });
     it('should get a field validate error', async function () {
       let user = { username: 'helloworld', password: '1', email:'helloworld@gmail.com' };
       let res = await UserService.register(user);
-      res.code.should.be.not.ok();
+      res.code.should.not.equal(0);
     });
   });
 
@@ -77,18 +77,18 @@ describe.only('user service', () => {
     it('should register success', async function() {
       let admin = { username: 'admin', password: '88888888', email:'admin@wynfrith.me' };
       let res = await UserService.registerAdmin(admin);
-      res.code.should.be.ok();
+      res.code.should.equal(0);
       res.data.should.have.property('role', 'admin');
 
       res = await UserService.deleteUserForce(res.data._id);
-      res.code.should.be.ok();
+      res.code.should.equal(0);
       res.data.should.have.property('username', 'admin');
     });
 
     it('should register error', async function(){
       let admin = { username: 'admin', password: '88888888', email:'adminadmin' };
       let res = await UserService.registerAdmin(admin);
-      res.code.should.be.not.ok();
+      res.code.should.not.equal(0);
       res.errors[0].should.have.property('error', 'email');
     });
 
@@ -100,7 +100,7 @@ describe.only('user service', () => {
         
         zeyang.info.brief = '哈哈';
         let res = await UserService.updateInfo(zeyang._id, zeyang);
-        res.code.should.be.ok();
+        res.code.should.equal(0);
 
         zeyang = await UserService.getUserByName('泽仰');
         zeyang.info.should.have.property('brief', '哈哈');
@@ -127,7 +127,7 @@ describe.only('user service', () => {
       it('should update failed', async function() {
         let wynfrith = await UserService.getUserByName('wynfrith');
         let res = await UserService.updatePassword(wynfrith._id, '123');
-        res.code.should.be.not.ok();
+        res.code.should.not.equal(0);
       })
     });
 

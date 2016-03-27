@@ -4,7 +4,7 @@
 
 // 保存或跟新成功
 const Ok = (data) => {
-  return { code: true, data: data }
+  return { code: 0, data: data }
 };
 
 // 保存或更新出错
@@ -19,7 +19,11 @@ const SaveError = (err) => {
     errors = err;
   }
 
-  return { code: false, errors: errors};
+  return { code: 1, errorType: 'SaveOrModifyFailed', errors: errors};
 };
 
-export { Ok, SaveError };
+const NotFoundError = () => {
+  return { code: 2, errorType: 'NotFound'};
+};
+
+export { Ok, SaveError, NotFoundError };

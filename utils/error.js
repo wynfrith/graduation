@@ -19,11 +19,15 @@ const SaveError = (err) => {
     errors = err;
   }
 
-  return { code: 1, errorType: 'SaveOrModifyFailed', errors: errors};
+  return { code: 1,  errors: errors};
 };
 
 const NotFoundError = () => {
-  return { code: 2, errorType: 'NotFound'};
+  return { code: 2 };
 };
 
-export { Ok, SaveError, NotFoundError };
+const ConstraintsError = () => {
+  return { code: 3 };
+};
+ 
+export { Ok, SaveError, NotFoundError, ConstraintsError };

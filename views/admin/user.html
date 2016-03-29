@@ -1,0 +1,256 @@
+{% extends "admin/layout.html" %}
+
+{% block exthead %}
+<link rel="stylesheet" href="/css/user.css">
+{% endblock %}
+
+{% block extscript %}
+<script>
+    $(function() {
+        //搜索
+        $('#searchText').on('keypress', function(e) {
+            if (e.keyCode === 13) {
+                e.preventDefault();
+                var text = $('#searchText');
+                $app.search(text.val(), true);
+            }
+        })
+        $('#searchBtn').on('click', function() {
+            var text = $('#searchText');
+            $app.search(text.val(), true);
+        })
+
+        // 翻页
+        $('#prevPage').on('click', function() { $app.appendQs({page: $('#prevPage').data('page')}) })
+        $('#nextPage').on('click', function() { $app.appendQs({page: $('#nextPage').data('page')}) })
+        $('#jumpPage').on('click', function() {
+            var page = $('#jumpPageInput').val();
+            if (!page) {
+            } else if (page < 1 || page > {{ pageNum }}) {
+                $app.notify('超过最大允许数值')
+            } else if (!!isNaN(page)) {
+                $app.notify('您输入的数字不合法')
+            } else {
+                $app.appendQs({page: page})
+            }
+        })
+
+        /*  选择与全选 */
+        var items = [];
+        var checkboxs =  $('.table td input[type=checkbox]');
+        var banBtn = $('.ban-btn[type="button"]');
+        $('.table td').on('click', 'input[type=checkbox]', function() {
+            var id = $(this).val();
+            var index;
+            if ((index = items.indexOf(id)) > -1)  { // 已经选中了
+                console.log(items);
+                items.splice(index, 1)
+                $('#check-all').prop('checked', false)
+                if (items.length === 0)  banBtn.prop('disabled', true);
+
+            } else {
+                items.push(id);
+                banBtn.prop('disabled', false);
+                if (checkboxs.length === items.length) $('#check-all').prop('checked', true)
+            }
+        })
+        $('.table #check-all').on('click', function() {
+            // 如果已满, 那么变为全空
+            if (items.length === checkboxs.length) {
+                checkboxs.each(function(i, c) { $(c).prop('checked', false) })
+                banBtn.prop('disabled', true);
+                items = [];
+            } else {
+                // 如果全空或者半空 变为满,
+                banBtn.prop('disabled', false);
+                checkboxs.each(function(i, checkbox) {
+                    if (!$(checkbox).prop('checked')) {
+                        $(checkbox).prop('checked', true);
+                        items.push($(checkbox).val())
+                    }
+                })
+            }
+        });
+
+        /* 封号与解封 */
+        $(document).on('click', function(e) {
+            var target = $(e.target)
+            if(!target.is('.popmsg, .popmsg *')) {
+                $('.popmsg').hide();
+            }
+        })
+        $('#banUser').on('click', function(e) { e.stopPropagation(); $('#banPopMsg').toggle(); })
+        $('#unbanUser').on('click', function(e) { e.stopPropagation(); $('#unbanPopMsg').toggle(); })
+        $('#doBan').on('click', function() {
+            //发送ajax请求, 如果成功, 删除选中行, 同时item要清除
+            $.ajax({ url: '/user/ban', method: 'post', data: { ids: items.join(';') }})
+                    .success(function(data) {
+                        if (data.code === 0) {
+                            $('tbody tr').each(function(i, tr) {
+                                if ($(tr).find('input[type=checkbox]').prop('checked')) {
+                                    $(tr).remove();
+                                }
+                            })
+                            items = [];
+                            banBtn.prop('disabled', true);
+                            $('#check-all').prop('checked', false);
+                            $app.notify('封号成功')
+                        } else {
+                            $app.notify('操作失败!  ' + data.msg)
+                        }
+                    })
+            $('#banPopMsg').hide();
+        })
+        $('#doUnban').on('click', function() {
+            $.ajax({ url: '/user/unban', method: 'post', data: { ids: items.join(';') }})
+                    .success(function(data) {
+                        if (data.code === 0 ) {
+                            $('tbody tr').each(function(i, tr) {
+                                if ($(tr).find('input[type=checkbox]').prop('checked')) {
+                                    $(tr).remove();
+                                }
+                            })
+                            items = [];
+                            banBtn.prop('disabled', true);
+                            $('#check-all').prop('checked', false)
+                            $app.notify('解除封号成功!')
+                        }
+                    })
+            $('#unbanPopMsg').hide();
+        })
+
+    })
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- Page-Title -->
+<div class="row">
+    <div class="col-sm-12">
+        <h4 class="page-title">用户管理</h4>
+    </div>
+</div>
+
+<!-- 搜索栏 -->
+<div class="row">
+    <div class="col-sm-4">
+        <form class="form">
+            <div class="form-group">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="搜索用户" id="searchText" value="{{ searchText }}" >
+          <span class="input-group-btn">
+            <button type="button" id="searchBtn" class="btn waves-effect waves-light btn-default"><i class="fa fa-search"></i></button>
+          </span>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 内容 -->
+<div class="row">
+
+    <div class="col-xs-9">
+        <div class="card-box user-card-box">
+            <div class="user-title">
+        <span>
+          {{typeName}}
+        </span>
+            </div>
+            <div class="table-container">
+                <table class="table" cellspacing="0">
+                    <thead>
+                    <tr>
+                        <th colspan="2">
+                            <div class="table-head">
+                                <div class="checkbox checkbox-default checkbox-inline">
+                                    <input id="check-all" type="checkbox">
+                                    <label for="check-all">
+                                        全选
+                                    </label>
+                                </div>
+
+
+                  <span class="ban-button-outter">
+                    {% if isInvalid %}
+                    <button type="button" class="btn btn-success ban-btn" id="unbanUser" disabled="true">解封</button>
+                    {% else %}
+                    <button type="button" class="btn btn-default ban-btn" id="banUser" disabled="true">封号处理</button>
+                    {% endif %}
+                      <!-- 提示框 -->
+
+                    <div class="popmsg" id="banPopMsg">
+                        <p>您确定将选中的用户进行封号处理吗?</p>
+                        <div class="popmsg_btn">
+                            <a href="javascript:;" class="btn btn-success" id="doBan">确定</a>
+                            <a href="javascript:(function(){ $('#banPopMsg').hide()})();" class="btn btn-white">取消</a>
+                        </div>
+                    </div>
+                    <div class="popmsg" id="unbanPopMsg">
+                        <p>您要将选中账号解封吗?</p>
+                        <div class="popmsg_btn">
+                            <a href="javascript:;" class="btn btn-success" id="doUnban">确定</a>
+                            <a href="javascript:(function(){ $('#unbanPopMsg').hide()})();" class="btn btn-white">取消</a>
+                        </div>
+                    </div>
+
+                  </span>
+                            </div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td class="td-user-brief">
+                            <div class="checkbox checkbox-single checkbox-default checkbox-inline">
+                                <input type="checkbox" id="check-{{ user.id }}" value="{{ user.id }}" >
+                                <label for="check-{{ user.id }}"></label>
+                            </div>
+                            <a href="user/{{ user.id }}" target="_blank">
+                                <img src="{{ user.profilePhotoPath if user.profilePhotoPath else '/images/default-user.png'}}" alt="头像">
+                                <span>{{ user.username }}</span>
+                            </a>
+                        </td>
+                        <td class="td-user-operate">
+                            <p>类型:
+                                <span>{{ user.roleList[0].memo }}</span>
+                            </p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+                <div class="pagination">
+          <span class="page-nav">
+            <a href="javascript:;" class="btn btn-white {{ 'disabled' if page == 1 }}" id="prevPage" data-page={{+page - 1}}><i class=" ti-angle-left"></i></a>
+            <span class="page-num"> {{page}} / {{ pageNum if pageNum != 0 else '1'}} </span>
+            <a href="javascript:;" class="btn btn-white {{ 'disabled' if page == pageNum }}" id="nextPage" data-page={{+page + 1}}><i class=" ti-angle-right"></i></a>
+          </span>
+          <span class="go-page">
+            <input type="text" class="" id="jumpPageInput">
+            <a href="javascript:;" class="btn btn-white" id="jumpPage">跳转</a>
+          </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-3">
+        <div class="card-box user-role-box">
+            <ul>
+                <li class="{{ 'actived' if typeName == '所有用户'}}"><a href="/user">所有用户</a></li>
+                <ul>
+                    <li class="{{ 'actived' if typeName == '学生'}}"><a href="/user?type=student">学生</a></li>
+                    <li class="{{ 'actived' if typeName == '商家'}}"><a href="/user?type=employer">商家</a></li>
+                    <li class="{{ 'actived' if typeName == '管理员'}}"><a href="/user?type=admin">管理员</a></li>
+                </ul>
+                <li class="{{ 'actived' if typeName == '封号用户'}}"><a href="/user?invalid=true">封号用户</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

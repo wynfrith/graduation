@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {% include "admin/common/head.html" %}
+
+    {% block exthead %}{% endblock %}
+</head>
+
+<body class="fixed-left">
+
+<!-- Begin page -->
+<div id="wrapper">
+
+    {% include "admin/common/topbar.html" %}
+
+    {% include "admin/common/leftbar.html" %}
+
+
+    <div class="content-page">
+        <!-- Start content -->
+        <div class="content">
+            <div class="container">
+
+                {% block content %}{% endblock %}
+
+            </div>
+            <!-- container -->
+        </div>
+        <!-- content -->
+
+        <footer class="footer">
+            <ul>
+                <li><a href="http://taolijie.cn" target="_blank" style="color:#58666e">桃李街首页</a></li>
+                <li>技术支持: <a href="https://github.com/wynfrith" target="_blank">wynfrith</a>, <a href="https://github.com/wanghongfei" target="_blank">wanghongfei</a></li>
+                <li>Copyright © 2015 Taolijie.</li>
+            </ul>
+        </footer>
+
+    </div>
+
+
+</div>
+
+{% include "admin/common/footer.html" %}
+{% block extscript %}{% endblock %}
+
+</body>
+
+</html>

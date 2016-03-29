@@ -1,0 +1,141 @@
+.user-card-box {
+  padding: 15px 0;
+  border-color: #e3e3e3;
+}
+.user-title {
+  font-size: 14px;
+  border-bottom: 1px solid #e3e3e3;
+  padding: 0 0 15px 12px;
+  color: #444;
+}
+
+.table {
+  margin-bottom: 15px;
+}
+.table th {
+  border-bottom: 0px solid #FBFBFB !important;
+  background: #FBFBFB;
+}
+.table tr {
+  border-bottom: 1px solid #e3e3e3;
+}
+
+.table .table-head .ban-btn{
+  margin-left: 20px;
+  padding: 4px 12px;
+}
+.table .td-user-brief img {
+  width: 60px;
+  height: 60px;
+}
+.table .td-user-brief span {
+  display: inline-block;
+  margin: 0 15px;
+}
+.table .td-user-operate p {
+  line-height: 60px;
+  margin: 0;
+}
+.pagination {
+  margin: 5px 0;
+}
+.page-nav, .go-page {
+  margin: 0 15px;
+}
+.pagination .btn {
+  padding: 4px 6px;
+}
+.pagination .page-num {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 0 3px;
+}
+.pagination .go-page input{
+  border: 1px solid #eaeaea;
+  border-radius: 3px;
+  padding: 4px 12px;
+  display: inline-block;
+  vertical-align: middle;
+  width: 60px;
+}
+
+.user-role-box {
+  border-color: #e3e3e3;
+  padding: 6px 0;
+}
+.user-role-box a {
+  color: #36404a;
+  display: inline-block;
+  width: 100%;
+}
+.user-role-box ul {
+  list-style: none;
+  padding:0;
+  margin: 0;
+}
+.user-role-box ul > ul {
+  border-bottom: 1px solid #e3e3e3;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+}
+.user-role-box li>a {
+  padding: 5px 20px;
+}
+.user-role-box ul > ul > li > a{
+  padding-left: 40px;
+}
+.user-role-box li:hover {
+  background-color: #FBFBFB;
+}
+.user-role-box li.actived {
+  background-color: #F7F7F7;
+}
+
+/* popover 弹框 */
+.ban-button-outter {
+  position: relative;
+}
+
+.ban-button-outter .popmsg {
+  display: none;
+  font-weight: normal;
+  left: 0;
+  top: 34px;
+  position: absolute;;
+  width: 300px;
+  height: auto;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  color: #36404a;
+  z-index: 999;
+  background-color: #fff;
+  padding: 15px 30px;
+  box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.06)
+}
+.ban-button-outter .popmsg:before, .ban-button-outter .popmsg:after {
+  border: solid transparent;
+    content: ' ';
+    height: 0;
+    position: absolute;
+    width: 0;
+}
+.ban-button-outter .popmsg:after{
+  top: -14px;
+  left: 50px;
+  border-width: 7px;
+ border-bottom-color: #fff;
+}
+.ban-button-outter .popmsg:before{
+  top: -16px;
+  left: 49px;
+  border-width: 8px;
+ border-bottom-color: #ccc;
+}
+.ban-button-outter .popmsg_btn{
+  margin-top: 12px;
+  text-align: center;
+}
+.ban-button-outter .popmsg_btn a {
+  margin:0 15px;
+  padding: 4px 25px;
+}

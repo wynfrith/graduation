@@ -27,7 +27,11 @@ const TagService = {
     if (count > 0) {
       return ConstraintsError();
     } else {
-      await Tag.update({_id: tagId}, {is_del: true});
+      try {
+        return Ok(await Tag.update({_id: tagId}, {is_del: true}));
+      } catch (err){
+        return SaveError(err);
+      }
     }
   },
 

@@ -2,20 +2,27 @@ import path from 'path'
 import Koa from 'koa'
 import mongoose from 'mongoose'
 import convert from 'koa-convert'
-import logger from 'koa-logger'
+import morgan from 'koa-morgan'
 import serve from 'koa-static'
 import favicon from 'koa-favicon'
+import etag from 'koa-etag'
+import conditional from 'koa-conditional-get'
 
 import router from './routes/router';
 import adminRouter from './routes/adminRouter';
 import errorHandler from './middlewares/errorHandler'
 import nunjucks from './middlewares/nunjucks-2'
 
+import dateFilter from './utils/filters/dateFilter'
+
 const app = new Koa();
 
 
 // middleware
-app.use(convert(logger()));
+app.use(morgan('dev'));
+app.use(conditional());
+app.use(etag());
+
 app.use(serve(path.join(__dirname, '/public')));
 app.use(favicon(__dirname + '/public/images/favicon.ico'));
 // app.use(nunjucks());
@@ -26,8 +33,13 @@ app.use(nunjucks({
   nunjucksConfig: {
     autoescape: true,
     watch: true
+  },
+  configureEnvironment: (env) => {
+    env.addFilter('dateFilter', dateFilter);
   }
 }));
+
+
 
 app.use(errorHandler());
 

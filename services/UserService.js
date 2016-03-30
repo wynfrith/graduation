@@ -87,8 +87,23 @@ const UserService = {
   },
 
   //查询isdel = false的, bylasttime
-  getUsers: async ({ skip = 0, limit = 10, sort = { createAt: -1 }} = {}) => {
-    return await User.find({isDel: false}).sort(sort).limit(limit).skip(skip);
+  getUsers: async ({ page = 1,limit = 10, sort = { createAt: -1 }, filter = {}} = {}) => {
+    filter.isDel = false;
+    const f = {};
+
+
+
+    // 计算skip
+    let skip = (page - 1) * limit;
+    skip  = skip > 0 ? skip : 0;
+    
+    for(let [k,v] of Object.entries(filter)) 
+      if (v != undefined) f[k] = v;
+    
+    return await Promise.all([
+      User.find(f).sort(sort).limit(limit).skip(skip),
+      User.count(f)
+      ])
   },
 
   getUsersCount: async () => {

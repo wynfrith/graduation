@@ -1,0 +1,3 @@
+[submodule "public/frontend"]
+	path = public/frontend
+	url = git@github.com:wynfrith/graduation-frontend.git

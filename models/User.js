@@ -59,4 +59,4 @@ UserSchema.plugin(timestamp);
 UserSchema.plugin(uniqueValidator);
 UserSchema.set('toJSON', {transform(doc, ret) { delete ret.password; }});
 
-export default mongoose.model('User', UserSchema);
+module.exports = mongoose.model('User', UserSchema);

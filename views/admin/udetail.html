@@ -1,10 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "admin/layout.html" %}
 
-</body>
-</html>
+{% block content %}
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card-box">
+            <h4 class="header-title">用户</h4>
+            <ul>
+                <li>头像</li>
+                <li>用户名 链接到该用户</li>
+                <li>邮箱</li>
+                <li>权限</li>
+                <li>状态</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card-box">
+            <h4 class="header-title">动态</h4>
+            <span>查询前几条答案, 问题, 评论, 修改信息的情况</span>
+            <span>需要一张独立的表</span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card-box">
+            <h4 class="header-title" style="text-transform: none;">{{ user.username }}的问题</h4>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card-box">
+            <h4 class="header-title" style="text-transform: none;">{{ user.username }}的回答</h4>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

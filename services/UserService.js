@@ -87,11 +87,10 @@ const UserService = {
   },
 
   //查询isdel = false的, bylasttime
-  getUsers: async ({ page = 1,limit = 10, sort = { createAt: -1 }, filter = {}} = {}) => {
+  getUsers: async ({ page = 1,limit = 10, search = '', sort = { createAt: -1 }, filter = {}} = {}) => {
     filter.isDel = false;
     const f = {};
-
-
+    
 
     // 计算skip
     let skip = (page - 1) * limit;
@@ -99,10 +98,17 @@ const UserService = {
     
     for(let [k,v] of Object.entries(filter)) 
       if (v != undefined) f[k] = v;
-    
+
+    // search
+    let reg = '';
+    if (search) {
+      reg = new RegExp(search, 'i');
+    }
+    console.log(reg);
+
     return await Promise.all([
-      User.find(f).sort(sort).limit(limit).skip(skip),
-      User.count(f)
+      User.find(f).sort(sort).limit(limit).skip(skip).regex('username',reg),
+      User.find(f).regex('username', reg).count()
       ])
   },
 

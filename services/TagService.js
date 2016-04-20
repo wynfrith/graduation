@@ -68,8 +68,15 @@ const TagService = {
   },
   
   // 获取parentId下的所有tags
-  getTags:async (parentId) => {
-    return await Tag.find({ isDel: false, parentId: parentId});
+  getTags: async ({ page = 1,limit = 10, sort = { createAt: -1 }, parentId = ''} = {}) => {
+    let filter = { isDel: false};
+    let skip = (page - 1) * limit;
+    skip  = skip > 0 ? skip : 0;
+
+    return Promise.all([
+      await Tag.find(filter).skip(skip).limit(limit).sort(sort),
+      await Tag.find(filter).count()
+      ])
   },
   
   getTagsCount: async (parentId) => {

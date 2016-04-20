@@ -1,10 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "admin/layout.html" %}
 
-</body>
-</html>
+{% block content %}
+
+{% set colors = [ 'success', 'warning', 'info', 'default'] %}
+
+<div class="row">
+  <h4 class="page-title">标签管理</h4>
+</div>
+
+<div class="row">
+  <div class="col-xs-12">
+    <div class="card-box">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>名称</th>
+            <th>描述</th>
+            <th>父标签</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for tag in tags %}
+          <tr>
+            <td><span class="label label-table label-{{ colors | random }}">{{ tag.name }}</span></td>
+            <td>{{ tag.memo }}</td>
+            <td>{{ tag.parentId }}</td>
+          </tr>
+        {% endfor%}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

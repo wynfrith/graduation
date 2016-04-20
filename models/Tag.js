@@ -11,7 +11,7 @@ const TagSchema = new Schema({
   name: { type: String, unique: true, required: true },
   memo: { type: String },
   isDel: { type: Boolean, default: false }
-});
+}, {versionKey: false});
 
 
 TagSchema.plugin(timestamp);

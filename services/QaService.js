@@ -23,6 +23,7 @@ const QaService = {
       return SaveError(err)
     }
   },
+  // 添加答案同时当前问题答案计数+1
   createAnswer:async (answer, qid, user) => {
     answer = new Qa({
       type: false,
@@ -32,7 +33,12 @@ const QaService = {
       questionId: qid
     });
     try {
-      return Ok(await answer);
+      const question = await Qa.findOne({idDel: false, _id: uid});
+      question.answerNum += 1;
+      return Ok(await Promise.all([
+        question.save(),
+        answer.save()
+      ]))
     } catch (err) {
       return SaveError(err);
     }
@@ -91,7 +97,7 @@ const QaService = {
     skip = 0,
     limit = 10,
     sort = { createAt: -1 }
-  }) => {
+  } = {}) => {
     return await Qa.find({isDel: false, authorId: uid })
       .sort({ createAt: -1}).limit(limit).skip(skip);
   },
@@ -100,7 +106,7 @@ const QaService = {
     skip = 0,
     limit = 10,
     sort = { createAt: -1 }
-  }) => {
+  } = {}) => {
     return await Qa.find({isDel: false, authorId: uid, type: true})
       .sort({ createAt: -1}).limit(limit).skip(skip);
   },
@@ -108,7 +114,7 @@ const QaService = {
   getAnswersByUser: async (uid, {
     skip = 0, 
     limit = 0
-  }) => {
+  } = {}) => {
     return await Qa.find({isDel:false, authorId: uid, type: false })
   },
 
@@ -121,10 +127,20 @@ const QaService = {
   },
   
   
-  getQuestions:async  ( {skip = 0, limit = 10, sort = { createAt: -1}}) => {
-    return await Qa.find({isDel: false}).sort(sort).limit(limit).skip(skip);
+  getQuestions:async  ( {skip = 0, limit = 10, sort = "", fields = {}} = {}) => {
+    if (sort == 'hot') {
+      sort = { answerNum: -1,  createdAt: -1 }
+    } else {
+      sort = { createdAt: -1 }
+    }
+    return await Qa.find({isDel: false, type: true}, fields ).sort(sort).limit(limit).skip(skip);
   },
-
+  
+  getRecommendQuestions: async ({limit = 10} = {}) => {
+    let sort = { like: -1 , createdAt: -1};
+    let fields = {title: 1, hate: 1, like: 1};
+    return await Qa.find({isDel: false, type: true}, fields).sort(sort).limit(limit);
+  },
 
   // 如果答案已经被采纳, 则取消采纳
   adoptAnswer:async  (aid) => {

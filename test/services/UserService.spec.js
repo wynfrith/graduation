@@ -3,7 +3,7 @@ import UserService from "../../services/UserService";
 import mongoose from "mongoose";
 import User from "../../models/User";
 
-describe.only('user service', () => {
+describe.skip('user service', () => {
   before(() => mongoose.connect('mongodb://localhost/newQA'));
   after (() => mongoose.connection.close());
   

@@ -20,11 +20,26 @@ const QaSchema = new Schema({
   hate: Array, 
   isAccept: { type: Boolean, default: false }, // 被采纳
   isClosed: { type: Boolean, default: false },
-  isDel: { type: Boolean, default: false }
-});
+  isDel: { type: Boolean, default: false },
+  answerNum: { type:Number, default: 0},
+  views: { type: Number, default: 0},
+  comments: [{
+    id: { type: ObjectId },
+    author: { type: String },
+    avatar: { type: String },
+    content: { type: String },
+    isDel: { type: Boolean, default: false }
+  }]
+}, {versionKey: false});
 
+// 投票数
 QaSchema.virtual('score').get(function() {
   return this.like.length - this.hate.length;
 });
+
+// 回答数
+
 QaSchema.plugin(timestamp);
+QaSchema.set('toJSON', { virtuals: true });
+QaSchema.set('toObject', { virtuals: true });
 export default mongoose.model('Qa', QaSchema);

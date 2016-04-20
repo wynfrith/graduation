@@ -13,7 +13,7 @@ const UserNotifySchema = new Schema({
   isRead: { type: Boolean, default: false },
   userId: { type: ObjectId },
   notifyId: { type: ObjectId }
-});
+}, {versionKey: false});
 
 UserNotifySchema.plugin(timestamp);
 export default mongoose.model('UserNotify', UserNotifySchema);

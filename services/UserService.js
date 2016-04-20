@@ -8,7 +8,15 @@ const UserService = {
   getUserByName: async (username) => {
     return await User.findOne({ isDel: false, username: username });
   },
-
+  getUserBrief: async (username) => {
+    return await User.findOne({isDel: false, username: username}, {
+      username: 1,
+      role: 1,
+      email: 1,
+      'info.photoAddress': 1,
+      'info.brief': 1
+    })
+  },
   getUserById: async (uid) => {
     return await User.findOne({ isDel: false, _id: uid });
   },

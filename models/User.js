@@ -52,7 +52,7 @@ const UserSchema = new Schema({
     website: String,
     address: String
   }
-});
+}, {versionKey: false});
 
 
 UserSchema.plugin(timestamp);

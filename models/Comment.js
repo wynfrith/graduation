@@ -13,7 +13,7 @@ const CommentSchema = new Schema({
   qaId: { type: ObjectId },
   content: { type: String },
   isDel: { type: Boolean, default: false }
-});
+}, {versionKey: false});
 
 CommentSchema.plugin(timestamp);
 export default mongoose.model('Comment', CommentSchema);

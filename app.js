@@ -2,6 +2,7 @@ import path from 'path'
 import Koa from 'koa'
 import mongoose from 'mongoose'
 import convert from 'koa-convert'
+import cors from 'kcors'
 import morgan from 'koa-morgan'
 import serve from 'koa-static'
 import favicon from 'koa-favicon'
@@ -10,6 +11,7 @@ import conditional from 'koa-conditional-get'
 
 import router from './routes/router';
 import adminRouter from './routes/adminRouter';
+import apiRouter from './routes/apiRouter'
 import errorHandler from './middlewares/errorHandler'
 import nunjucks from './middlewares/nunjucks-2'
 
@@ -22,6 +24,8 @@ const app = new Koa();
 app.use(morgan('dev'));
 app.use(conditional());
 app.use(etag());
+app.use(cors());
+
 
 app.use(serve(path.join(__dirname, '/public')));
 app.use(favicon(__dirname + '/public/images/favicon.ico'));
@@ -48,6 +52,8 @@ app
   .use(router.routes())
   .use(router.allowedMethods());
 
+app.use(apiRouter.routes())
+   .use(router.allowedMethods());
 app
   .use(adminRouter.routes());
 

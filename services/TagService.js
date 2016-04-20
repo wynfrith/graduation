@@ -72,11 +72,15 @@ const TagService = {
     let filter = { isDel: false};
     let skip = (page - 1) * limit;
     skip  = skip > 0 ? skip : 0;
+    return Tag.find(filter).skip(skip).limit(limit).sort(sort);
+    // return Promise.all([
+    //   await Tag.find(filter).skip(skip).limit(limit).sort(sort),
+    //   await Tag.find(filter).count()
+    //   ])
+  },
 
-    return Promise.all([
-      await Tag.find(filter).skip(skip).limit(limit).sort(sort),
-      await Tag.find(filter).count()
-      ])
+  getHotTags: async ({limit = 10} = {}) => {
+    return Tag.find({}, {name: 1}).limit(limit);
   },
   
   getTagsCount: async (parentId) => {

@@ -21,7 +21,7 @@ const NotifySchema = new Schema({
     type: String,
     enum: ['answer', 'comment', 'reply', 'like', 'hate']
   }  // 比如说 comment/like/post/update
-});
+}, {versionKey: false});
 
 NotifySchema.plugin(timestamp);
 export default mongoose.model('Notify', NotifySchema);

@@ -8,7 +8,9 @@ import UserService from "../services/UserService";
 
 const router = new Router();
 
-router.get('/', (ctx) => { ctx.redirect('/admin')});
+router.get('/', async (ctx) => {
+  await ctx.render('index');
+});
 
 router.get('/nunjucks', async ctx => await ctx.render('index'));
 

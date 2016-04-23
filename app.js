@@ -7,6 +7,7 @@ import morgan from 'koa-morgan'
 import serve from 'koa-static'
 import favicon from 'koa-favicon'
 import etag from 'koa-etag'
+import bodyparser from 'koa-bodyparser'
 import conditional from 'koa-conditional-get'
 
 import router from './routes/router';
@@ -23,6 +24,7 @@ const app = new Koa();
 // middleware
 app.use(morgan('dev'));
 app.use(conditional());
+app.use(convert(bodyparser()));
 app.use(etag());
 app.use(cors());
 

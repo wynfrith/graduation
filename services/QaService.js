@@ -103,19 +103,32 @@ const QaService = {
   },
 
   getQuestionsByUser:async  (uid, {
-    skip = 0,
+    page = 1,
     limit = 10,
     sort = { createAt: -1 }
   } = {}) => {
-    return await Qa.find({isDel: false, authorId: uid, type: true})
-      .sort({ createAt: -1}).limit(limit).skip(skip);
+    let skip = (page - 1) * limit;
+    skip  = skip > 0 ? skip : 0;
+
+    let filters = {isDel: false, authorId: uid, type: true};
+    return await Promise.all([
+      Qa.find(filters).sort({ createAt: -1}).limit(limit).skip(skip),
+      Qa.find(filters).count()
+    ])
   },
   
   getAnswersByUser: async (uid, {
-    skip = 0, 
+    page = 0,
     limit = 0
   } = {}) => {
-    return await Qa.find({isDel:false, authorId: uid, type: false })
+    let skip = (page - 1) * limit;
+    skip  = skip > 0 ? skip : 0;
+    
+    let filters = {isDel: false, authorId: uid, type:false};
+    return await Promise.all([
+      Qa.find(filters).sort({ createAt: -1}).limit(limit).skip(skip),
+      Qa.find(filters).count()
+    ])
   },
 
   getQuestionById: async (qid) => {
@@ -127,13 +140,31 @@ const QaService = {
   },
   
   
-  getQuestions:async  ( {skip = 0, limit = 10, sort = "", fields = {}} = {}) => {
+  getQuestions:async ({page= 1, limit = 10, sort = "", fields = {}} = {}) => {
+    let skip = (page - 1) * limit;
+    skip  = skip > 0 ? skip : 0;
+
     if (sort == 'hot') {
       sort = { answerNum: -1,  createdAt: -1 }
     } else {
       sort = { createdAt: -1 }
     }
-    return await Qa.find({isDel: false, type: true}, fields ).sort(sort).limit(limit).skip(skip);
+    let filter = {isDel: false, type: true};
+    return await Promise.all([
+      Qa.find(filter , fields ).sort(sort).limit(limit).skip(skip),
+      Qa.find(filter).count()
+    ]);
+  },
+
+  searchQuestions: async (text, {page = 1, limit = 10, sort = {createAt: -1}} = {}) => {
+    let skip = (page - 1) * limit;
+    skip  = skip > 0 ? skip : 0;
+    let reg = text ? new RegExp(text, 'i') :'';
+    let filters = {isDel: false, type: true};
+    return await Promise.all([
+      Qa.find(filters).sort(sort).limit(limit).skip(skip).regex('title', reg),
+      Qa.find(filters).regex('title', reg).count()
+    ])
   },
   
   getRecommendQuestions: async ({limit = 10} = {}) => {

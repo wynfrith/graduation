@@ -112,14 +112,22 @@ const UserService = {
     if (search) {
       reg = new RegExp(search, 'i');
     }
-    console.log(reg);
-
     return await Promise.all([
       User.find(f).sort(sort).limit(limit).skip(skip).regex('username',reg),
       User.find(f).regex('username', reg).count()
       ])
   },
+  searchGeneralUsers : async (text, { page = 1, limit = 10 , sort = { createdAt: -1}} = {}) => {
+    let skip = (page - 1) * limit;
+    skip  = skip > 0 ? skip : 0;
+    let reg = text ? new RegExp(text, 'i') : '';
 
+    let filters = {isDel: false, role:'user'};
+    return await Promise.all([
+      User.find(filters).sort(sort).limit(limit).skip(skip).regex('username', reg),
+      User.find(filters).regex('username', reg).count()
+    ]);
+  },
   getUsersCount: async () => {
     return await User.count({isDel: false})
   }

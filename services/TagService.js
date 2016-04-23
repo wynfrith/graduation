@@ -79,6 +79,18 @@ const TagService = {
     //   ])
   },
 
+  searchTags: async(text, {page = 1, limit = 10, sort = {createdAt: -1}} ={}) => {
+    let skip = (page - 1) * limit;
+    skip  = skip > 0 ? skip : 0;
+    let reg = text ? new RegExp(text, 'i') : '';
+
+    let filters = {isDel: false};
+    return await Promise.all([
+      Tag.find(filters).sort(sort).limit(limit).skip(skip).regex('name', reg),
+      Tag.find(filters).regex('name', reg).count()
+    ]);
+  },
+
   getHotTags: async ({limit = 10} = {}) => {
     return Tag.find({}, {name: 1}).limit(limit);
   },

@@ -19,6 +19,15 @@ const UserService = {
       'info.brief': 1
     })
   },
+  getUserBriefById: async (uid) => {
+    return await User.findOne({isDel: false, _id: uid}, {
+      username: 1,
+      role: 1,
+      email: 1,
+      'info.photoAddress': 1,
+      'info.brief': 1
+    })
+  },
   getUserById: async (uid) => {
     return await User.findOne({ isDel: false, _id: uid });
   },
@@ -31,6 +40,15 @@ const UserService = {
   genToken: (user) => {
     const id = user._id;
     return koaJwt.sign({id: user._id}, cfg.secret);
+  },
+
+  // 验证token
+  verifyToken: (token) => {
+    try {
+      return koaJwt.verify(token, cfg.secret);
+    } catch (err) {
+      return null;
+    }
   },
   // 登陆验证
   isValid: (user, password) => {

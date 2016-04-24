@@ -73,9 +73,9 @@ router.get('/u/:uid/news', async (ctx) => {
 });
 
 // 获取用户提出的问题
-router.get('/u/:uid/questions', async (ctx) => {
+router.get('/u/:username/questions', async (ctx) => {
   let limit = ctx.query.limit || 10;
-  let [questions, count] = await QaService.getQuestionsByUser(ctx.params.uid, {
+  let [questions, count] = await QaService.getQuestionsByUser(ctx.params.username, {
     page: ctx.query.page,
     limit: limit
   });
@@ -90,14 +90,14 @@ router.get('/u/:uid/questions', async (ctx) => {
 });
 
 // 获取用户回答的答案
-router.get('/u/:uid/answers', async (ctx) => {
+router.get('/u/:username/answers', async (ctx) => {
   let limit = ctx.query.limit || 10;
-  let [questions, count] = await QaService.getAnswersByUser(ctx.params.uid, {
+  let [answers, count] = await QaService.getAnswersByUser(ctx.params.username, {
     page: ctx.query.page,
     limit: limit
   });
   ctx.body = {
-    questions: questions,
+    answers: answers,
     page: {
       currPage: +ctx.query.page || 1,
       pageNum: Math.ceil(count / limit),
@@ -188,16 +188,39 @@ router.post('/register', async (ctx) => {
   const res = await UserService.register({
     username: form.username,
     password: form.password,
-    email: form.email
+    email: form.email,
+    info: {
+      brief: '这个人很懒, 什么也没留下',
+      photoAddress: 'http://graduation.b0.upaiyun.com/assets/no-avatar.jpg'
+    }
   });
   if (res.code != 0) {
     return ctx.body = { code: 1, msg: '注册失败', errors: res.errors };
   }
   // 同样生成一个token, 发送给前端
-  console.info('注册完成', re);
   const token = UserService.genToken(res.data);
-  ctx.body = { code: 0 , token: '1231311'};
+  ctx.body = { code: 0 , token: token};
   
+});
+
+
+// 检查登陆状态,并返回用户信息
+router.post('/checkLogin', async (ctx) => {
+  const form = ctx.request.body;
+  if(!form.token) return ctx.body = {code: 1};
+  const res = UserService.verifyToken(form.token);
+  if(!res) return ctx.body = {code : 1};
+  const userBrief = await UserService.getUserBriefById(res.id);
+  ctx.body = { code: 0, userBrief: userBrief};
+});
+
+router.get('/checkLogin', async (ctx) => {
+  const form = ctx.query;
+  if(!form.token) return ctx.body = {code: 1};
+  const res = UserService.verifyToken(form.token);
+  if(!res) return ctx.body = {code : 1};
+  const userBrief = await UserService.getUserBriefById(res.id);
+  ctx.body = { code: 0, userBrief: userBrief};
 });
 
 
@@ -205,8 +228,6 @@ router.post('/register', async (ctx) => {
 
 
 // 评论
-
-
 
 // 注销
 

@@ -102,7 +102,7 @@ const QaService = {
       .sort({ createAt: -1}).limit(limit).skip(skip);
   },
 
-  getQuestionsByUser:async  (uid, {
+  getQuestionsByUser:async  (username, {
     page = 1,
     limit = 10,
     sort = { createAt: -1 }
@@ -110,21 +110,21 @@ const QaService = {
     let skip = (page - 1) * limit;
     skip  = skip > 0 ? skip : 0;
 
-    let filters = {isDel: false, authorId: uid, type: true};
+    let filters = {isDel: false, author: username, type: true};
     return await Promise.all([
       Qa.find(filters).sort({ createAt: -1}).limit(limit).skip(skip),
       Qa.find(filters).count()
     ])
   },
   
-  getAnswersByUser: async (uid, {
+  getAnswersByUser: async (username, {
     page = 0,
     limit = 0
   } = {}) => {
     let skip = (page - 1) * limit;
     skip  = skip > 0 ? skip : 0;
     
-    let filters = {isDel: false, authorId: uid, type:false};
+    let filters = {isDel: false, author: username, type:false};
     return await Promise.all([
       Qa.find(filters).sort({ createAt: -1}).limit(limit).skip(skip),
       Qa.find(filters).count()

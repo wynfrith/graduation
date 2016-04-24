@@ -2,6 +2,7 @@ import Router from 'koa-router';
 import UserService from '../services/UserService';
 import QaService from "../services/QaService";
 import TagService from "../services/TagService";
+import koaJwt from 'koa-jwt'
 // rest接口, 提供前端api
 const router = new Router({ prefix: '/api'});
 export default router;
@@ -166,7 +167,9 @@ router.post('/login', async (ctx) => {
     return ctx.body = { code: 1, msg: '密码错误'}
   }
   // TODO: 生成 token, 并写入session或local storage
-  ctx.body = { code: 0, token: '12123123' };
+  // console.info('登陆: ',user);
+  const token = UserService.genToken(user);
+  ctx.body = { code: 0, token: token };
 });
 
 // 注册
@@ -191,6 +194,8 @@ router.post('/register', async (ctx) => {
     return ctx.body = { code: 1, msg: '注册失败', errors: res.errors };
   }
   // 同样生成一个token, 发送给前端
+  console.info('注册完成', re);
+  const token = UserService.genToken(res.data);
   ctx.body = { code: 0 , token: '1231311'};
   
 });

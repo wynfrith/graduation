@@ -1,5 +1,7 @@
 import User from "../models/User";
 import {SaveError, Ok, NotFoundError} from "../utils/error";
+import koaJwt from 'koa-jwt'
+import cfg from '../config'
 /**
  * Created by wyn on 3/25/16.
  */
@@ -25,7 +27,11 @@ const UserService = {
     return await User.findOne({ isDel:  false, email: email });
   },
 
-
+ // 生成token
+  genToken: (user) => {
+    const id = user._id;
+    return koaJwt.sign({id: user._id}, cfg.secret);
+  },
   // 登陆验证
   isValid: (user, password) => {
     return user.password == password;

@@ -9,6 +9,7 @@ import favicon from 'koa-favicon'
 import etag from 'koa-etag'
 import bodyparser from 'koa-bodyparser'
 import conditional from 'koa-conditional-get'
+import koaJwt from 'koa-jwt'
 
 import router from './routes/router';
 import adminRouter from './routes/adminRouter';
@@ -18,15 +19,25 @@ import nunjucks from './middlewares/nunjucks-2'
 
 import dateFilter from './utils/filters/dateFilter'
 
+import cfg from './config'
+
 const app = new Koa();
 
 
 // middleware
 app.use(morgan('dev'));
+app.use(cors());
+app.use(convert(koaJwt({ secret: cfg.secret, debug: true}).unless({ path: [
+  // 主页
+  '/', /^\/admin/,
+  // 静态文件
+  /^\/css/, /^\/js/, /^\/images/, /^\/third/, /^\/upload/, /^\/frontend/, '/favicon.ico',
+  // 不需要验证的api接口
+  /^\/api\/(?!user\/)/
+]})));
 app.use(conditional());
 app.use(convert(bodyparser()));
 app.use(etag());
-app.use(cors());
 
 
 app.use(serve(path.join(__dirname, '/public')));

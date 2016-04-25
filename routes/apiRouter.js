@@ -218,26 +218,57 @@ router.get('/checkLogin', async (ctx) => {
   const form = ctx.query;
   if(!form.token) return ctx.body = {code: 1};
   const res = UserService.verifyToken(form.token);
-  if(!res) return ctx.body = {code : 1};
+  if(!res) return ctx.body = {code : 1, msg: '请登录'};
   const userBrief = await UserService.getUserBriefById(res.id);
   ctx.body = { code: 0, userBrief: userBrief};
 });
+
+// 修改个人资料
+router.post('/user/changeProfile', async (ctx) => {
+  const form = ctx.request.body;
+  const res = UserService.verifyToken(form.token);
+  if(!res) return ctx.body = {code : 1, msg: '请登录'};
+  ctx.body = await UserService.updateInfo(res.id, form.userInfos);
+});
+
+// 修改密码
+router.post('/user/changePass', async (ctx) => {
+  const form = ctx.request.body;
+  const res = UserService.verifyToken(form.token);
+  if(!res) return ctx.body = {code : 1, msg: '请登录'};
+  const user = await UserService.getUserById(res.id);
+  if (user.password != form.oldPassword) {
+    return ctx.body = {code: 1, msg: '修改失败: 原密码错误'}
+  }
+  if(user.password == form.newPassword) {
+    return ctx.body = {code: 1, msg: '修改失败: 新密码不要跟原密码一样'}
+  }
+  ctx.body = await UserService.updatePassword(res.id, form.newPassword);
+});
+
+// 修改邮箱
+router.post('/user/changeEmail', async (ctx) => {
+  const form = ctx.request.body;
+  const res = UserService.verifyToken(form.token);
+  if(!res) return ctx.body = {code : 1, msg: '请登录'};
+  const user = await UserService.getUserById(res.id);
+  // 向新邮箱中发送一封邮件 result = Util.sendMailTo( form.email );
+  ctx.body = { code: 0 };
+
+});
+
+// 找回密码
+router.post('/findPass', async (ctx) => {
+  const form = ctx.request.body;
+  // Util.sendMailTo(form.email); 需要跳转到摸个验证链接
+});
+
 
 
 // 投票(喜欢点赞)
 
 
 // 评论
-
-// 注销
-
-// 修改个人资料
-
-// 修改邮箱 (发送邮件)
-
-// 修改密码 (发送邮件)
-
-// 找回密码 (发送邮件)
 
 // 修改头像
 

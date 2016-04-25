@@ -18,18 +18,21 @@ import errorHandler from './middlewares/errorHandler'
 import nunjucks from './middlewares/nunjucks-2'
 
 import dateFilter from './utils/filters/dateFilter'
+import session from 'koa-generic-session'
+// import redisStore from 'koa-redis'
+import MongoStore from 'koa-generic-session-mongo'
 
 import cfg from './config'
 
 const app = new Koa();
 
-
+app.keys = [cfg.secret];
 // middleware
 app.use(morgan('dev'));
 app.use(cors());
 app.use(convert(koaJwt({ secret: cfg.secret, debug: true}).unless({ path: [
   // 主页
-  '/', /^\/admin/,
+  '/', '/verify', /^\/admin/,
   // 静态文件
   /^\/css/, /^\/js/, /^\/images/, /^\/third/, /^\/upload/, /^\/frontend/, '/favicon.ico',
   // 不需要验证的api接口
@@ -38,11 +41,12 @@ app.use(convert(koaJwt({ secret: cfg.secret, debug: true}).unless({ path: [
 app.use(conditional());
 app.use(convert(bodyparser()));
 app.use(etag());
-
-
 app.use(serve(path.join(__dirname, '/public')));
 app.use(favicon(__dirname + '/public/images/favicon.ico'));
-// app.use(nunjucks());
+
+app.use(convert(session({
+  store: new MongoStore()
+})));
 
 app.use(nunjucks({
   ext: 'html',
@@ -55,8 +59,6 @@ app.use(nunjucks({
     env.addFilter('dateFilter', dateFilter);
   }
 }));
-
-
 
 app.use(errorHandler());
 

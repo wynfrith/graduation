@@ -2,6 +2,8 @@ import User from "../models/User";
 import {SaveError, Ok, NotFoundError} from "../utils/error";
 import koaJwt from 'koa-jwt'
 import cfg from '../config'
+import sendMail from '../utils/sendMail'
+import captcha from '../utils/captcha';
 /**
  * Created by wyn on 3/25/16.
  */
@@ -41,6 +43,18 @@ const UserService = {
     const id = user._id;
     return koaJwt.sign({id: user._id}, cfg.secret);
   },
+  getEmailToken: (user) => {
+    const id = user._id;
+    return koaJwt.sign({id: user._id}, cfg.secret + 'mail')
+  },
+  sendMail: async (receiver, email, token) => {
+    const result = await sendMail({
+      receiver: receiver,
+      email: email,
+      token: token
+    });
+    console.log(result);
+  },
 
   // 验证token
   verifyToken: (token) => {
@@ -50,14 +64,35 @@ const UserService = {
       return null;
     }
   },
+  verifyEmailToken: (token) => {
+    try {
+      return koaJwt.verify(token, cfg.secret + 'mail');
+    } catch (err) {
+      return null;
+    }
+  },
   // 登陆验证
   isValid: (user, password) => {
     return user.password == password;
   },
+  
+  activeUser: async (uid) => {
+    try {
+      let user = await User.findOneAndUpdate(
+        {isDel: false, _id: uid}, { isActive: true });
+      return !!user ? Ok(user) : NotFoundError();
+    } catch (err) {
+      return SaveError(err);
+    }
+  },
 
+  genCaptcha(number){
+    return captcha(number);
+  },
 
   register: async (user) => {
     user.role = 'user';
+    user.isActive = false;
     user = new User(user);
     try {
       return Ok(await user.save());
@@ -75,6 +110,7 @@ const UserService = {
       return SaveError(err);
     }
   },
+  
 
   // 用户修改info资料,返回的是未修改前的信息
   updateInfo: async (uid, user) => {

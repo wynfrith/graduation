@@ -3,6 +3,7 @@ import UserService from '../services/UserService';
 import QaService from "../services/QaService";
 import TagService from "../services/TagService";
 import koaJwt from 'koa-jwt'
+import cfg from '../config'
 // rest接口, 提供前端api
 const router = new Router({ prefix: '/api'});
 export default router;
@@ -197,14 +198,16 @@ router.post('/register', async (ctx) => {
   if (res.code != 0) {
     return ctx.body = { code: 1, msg: '注册失败', errors: res.errors };
   }
-  // 同样生成一个token, 发送给前端
+  // 同样生成一个email token, 发送到用户的邮箱中
   const token = UserService.genToken(res.data);
+  const mailToken = UserService.getEmailToken(res.data);
+  UserService.sendMail(form.username, form.email, mailToken);
   ctx.body = { code: 0 , token: token};
   
 });
 
 
-// 检查登陆状态,并返回用户信息
+// 检查登陆状态,并返回用户信息 (post)
 router.post('/checkLogin', async (ctx) => {
   const form = ctx.request.body;
   if(!form.token) return ctx.body = {code: 1};
@@ -214,6 +217,7 @@ router.post('/checkLogin', async (ctx) => {
   ctx.body = { code: 0, userBrief: userBrief};
 });
 
+// 检查登陆状态, 并返回用户信息 (get)
 router.get('/checkLogin', async (ctx) => {
   const form = ctx.query;
   if(!form.token) return ctx.body = {code: 1};
@@ -223,12 +227,58 @@ router.get('/checkLogin', async (ctx) => {
   ctx.body = { code: 0, userBrief: userBrief};
 });
 
-// 修改个人资料
-router.post('/user/changeProfile', async (ctx) => {
-  const form = ctx.request.body;
-  const res = UserService.verifyToken(form.token);
-  if(!res) return ctx.body = {code : 1, msg: '请登录'};
-  ctx.body = await UserService.updateInfo(res.id, form.userInfos);
+
+router.post('/user/reSend', async (ctx) => {
+  const user = await UserService.getUserById(ctx.state.user.id);
+  const mailToken = UserService.getEmailToken(user);
+  UserService.sendMail(user.username, user.email, mailToken);
+  ctx.body = { code : 0 };
+});
+
+//
+router.get('/genCaptchaToken', async(ctx) => {
+  const number = parseInt(Math.random()*9000+1000);
+  ctx.body = koaJwt.sign(number, cfg.secret+'captcha', {
+    algorithm: 'HS256',
+    noTimestamp: true
+  });
+});
+// 生成验证码
+router.get('/captcha', async (ctx) => {
+  let token = ctx.query.r;
+  console.log('token gen: ', token);
+  try {
+    const number = koaJwt.verify(token, cfg.secret+'captcha');
+    ctx.body = UserService.genCaptcha(number);
+    ctx.type = 'image/png';
+  } catch (err) {
+    console.info(err);
+    return null;
+  }
+});
+
+// 找回密码
+router.post('/findPass', async (ctx) => {
+  const { email, code, token } = ctx.request.body;
+  let number = '';
+  try {
+    number = koaJwt.verify(token, cfg.secret+'captcha');
+  }catch (err) {
+    console.log(err);
+    return ctx.body = { code: 1, msg: '请输入正确的验证码'};
+  }
+
+  console.log('token', token);
+  console.log('number', number);
+  console.log('code', code);
+  if (code != number) return ctx.body = { code: 1, msg: '请输入正确的验证码'};
+  const user = await UserService.getUserByEmail(email);
+  if (!user) return ctx.body = { code: 1, msg: '这个邮箱并没有注册'};
+  
+  // sendMail
+  const mailToken = UserService.getEmailToken(user);
+  UserService.sendMail(user.username, user.email, mailToken);
+  ctx.body = { code : 0 };
 });
 
 // 修改密码
@@ -257,12 +307,13 @@ router.post('/user/changeEmail', async (ctx) => {
 
 });
 
-// 找回密码
-router.post('/findPass', async (ctx) => {
-  const form = ctx.request.body;
-  // Util.sendMailTo(form.email); 需要跳转到摸个验证链接
-});
 
+// 修改个人资料
+router.post('/user/changeProfile', async (ctx) => {
+  const form = ctx.request.body;
+  if(!res) return ctx.body = {code : 1, msg: '请登录'};
+  ctx.body = await UserService.updateInfo(res.id, form.userInfos);
+});
 
 
 // 投票(喜欢点赞)

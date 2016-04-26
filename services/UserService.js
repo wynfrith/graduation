@@ -92,9 +92,9 @@ const UserService = {
   },
 
   genAvatarInfos(x, y, width, height) {
-    const savePath = 'avatars/{year}/{mon}/{day}/IMG_{filemd5}{.suffix}';
+    const savePath = 'avatars/{year}/{mon}/{day}/IMG_{filemd5}{sec}{.suffix}';
     const options = {
-      'x-gmkerl-thumb': `/crop/${width}x${height}a${x}a${y}`
+      'x-gmkerl-thumb': `/crop/${width}x${height}a${x}a${y}/sq/300`
     };
     return uploadUtil(savePath, options);
   },
@@ -124,9 +124,18 @@ const UserService = {
   // 用户修改info资料,返回的是未修改前的信息
   updateInfo: async (uid, user) => {
     let info = user.info; // 只修改info信息
-    try { 
+    try {
       let user = await User.findOneAndUpdate(
         {isDel: false, _id: uid}, { info: info },{runValidators: true});
+      return !!user ? Ok(user) : NotFoundError();
+    } catch (err) {
+      return SaveError(err);
+    }
+  },
+  updateAvatar: async (uid, url) => {
+    try {
+      let user = await User.findOneAndUpdate(
+        {isDel: false, _id: uid}, { 'info.photoAddress': url });
       return !!user ? Ok(user) : NotFoundError();
     } catch (err) {
       return SaveError(err);

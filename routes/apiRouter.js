@@ -331,8 +331,8 @@ router.post('/user/avatarPreUpload', async (ctx) => {
 
 router.post('/user/avatarUpload', async (ctx) => {
   const url = ctx.request.body.url;
-  if (!url) return ctx.body = { code: 0, msg: '图片地址不能为空'};
-  ctx.body = await UserService.updateInfo(ctx.state.user.id, { photoAddress: url })
+  if (!url) return ctx.body = { code: 1, msg: '图片地址不能为空'};
+  ctx.body = await UserService.updateAvatar(ctx.state.user.id, url);
 });
 
 

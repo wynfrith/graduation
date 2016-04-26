@@ -122,11 +122,10 @@ const UserService = {
   
 
   // 用户修改info资料,返回的是未修改前的信息
-  updateInfo: async (uid, user) => {
-    let info = user.info; // 只修改info信息
+  updateInfo: async (uid, newInfo) => {
     try {
       let user = await User.findOneAndUpdate(
-        {isDel: false, _id: uid}, { info: info },{runValidators: true});
+        {isDel: false, _id: uid}, { info: newInfo });
       return !!user ? Ok(user) : NotFoundError();
     } catch (err) {
       return SaveError(err);

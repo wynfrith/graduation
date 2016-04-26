@@ -288,16 +288,21 @@ router.post('/findPass', async (ctx) => {
 // 修改密码
 router.post('/user/changePass', async (ctx) => {
   const form = ctx.request.body;
-  const res = UserService.verifyToken(form.token);
-  if(!res) return ctx.body = {code : 1, msg: '请登录'};
-  const user = await UserService.getUserById(res.id);
+  console.log(form);
+  const user = await UserService.getUserById(ctx.state.user.id);
   if (user.password != form.oldPassword) {
-    return ctx.body = {code: 1, msg: '修改失败: 原密码错误'}
+    console.log(user.password);
+    console.log(form.oldPassword);
+    return ctx.body = {code: 1, msg: '原密码错误'}
+  }
+  if(form.rePassword != form.newPassword) {
+    return ctx.body = {code: 1, msg: '两次密码不一致'}
   }
   if(user.password == form.newPassword) {
-    return ctx.body = {code: 1, msg: '修改失败: 新密码不要跟原密码一样'}
+    return ctx.body = {code: 1, msg: '新密码不要跟原密码一样'}
   }
-  ctx.body = await UserService.updatePassword(res.id, form.newPassword);
+
+  ctx.body = await UserService.updatePassword(ctx.state.user.id, form.newPassword);
 });
 
 // 修改邮箱
@@ -314,7 +319,7 @@ router.post('/user/changeEmail', async (ctx) => {
 
 // 修改个人资料
 router.post('/user/changeProfile', async (ctx) => {
-  const infos =  ctx.request.body.infos;
+  const infos =  ctx.request.body;
   ctx.body = await UserService.updateInfo(ctx.state.user.id, infos);
 });
 

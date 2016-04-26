@@ -12,7 +12,7 @@ const assert = chai.assert;
 
 let user;
 
-describe ('test qa', () => {
+describe.only('test qa', () => {
 
   before(async () => {
     mongoose.connect('mongodb://localhost/newQA');
@@ -30,6 +30,7 @@ describe ('test qa', () => {
     let question = new Qa({
       authorId: user._id,
       author: user.username,
+      authorAvatar: 'http://graduation.b0.upaiyun.com/avatars/2016/04/26/IMG_e563d8711ab4ea5389314c86d9312333.jpg',
       type: true,
       title: '测试markdown的渲染情况?',
       content: "# 这是最大的字体\n## 二号标题\n### 三号标题拉克丝就\n#### 四号标题\n##### 五号标题阿狸的减肥了\n\n> 卢萨卡的就打了款家的离开家里的空间阿达刻录机大空间里卡掉了\n\n这是一段**普通**的文字, `javascript` 是一门坑爹的语言, *斜体* 是这样的 @wynfrith\n\n\n1. 这是第一条\n\t- 哈哈\n\t- 呵呵\n2. 这是第二条\n\n这是一条链接 [http://wwynfrith.me](http://wynfrith.me)\n\n下面是一张图片 \n\n![我头像](http://my-ghost.b0.upaiyun.com/cunliang.png)\n\njs端\n``` javascript\nvar app = angular.module('myApp', []);\napp.controller('myCtrl', function ($scope, $http) {\n $http.get(\"test.ask\").success(function (response) {\n $scope.myWelcome = response;\n });\n});\n```\njsp端：\n\n```html\n<body>\n\t<div ng-app=\"myApp\" ng-controller=\"myCtrl\">\n\t\t <p> 从服务器获取的信息是:</p>\n\t\t <h3>{{myWelcome}}</h3>\n\t</div>\n\t<p> $http 服务向服务器请求信息，返回的值放入变量 中</p>\n</body>\n```",

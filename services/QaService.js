@@ -14,6 +14,7 @@ const QaService = {
       type: true,
       authorId: user._id,
       author: user.username,
+      authorAvatar: user.info.photoAddress,
       title: question.title,
       content: question.content
     });
@@ -29,11 +30,13 @@ const QaService = {
       type: false,
       authorId: user._id,
       author: user.username,
+      authorAvatar: user.info.photoAddress,
       content: answer.content,
       questionId: qid
     });
+    console.log(answer);
     try {
-      const question = await Qa.findOne({idDel: false, _id: uid});
+      const question = await Qa.findOne({isDel: false, _id: qid});
       question.answerNum += 1;
       return Ok(await Promise.all([
         question.save(),
@@ -136,7 +139,7 @@ const QaService = {
   },
 
   getAnswersByQuestion: async (qid) => {
-    return await Qa.find({isDel: true, parentId: qid, type: false });
+    return await Qa.find({isDel: false, questionId: qid, type: false });
   },
   
   
@@ -202,10 +205,14 @@ const QaService = {
       return SaveError(err);
     }
     
+  },
+
+  updateAvatar: async (author, avatar) => {
+    // find all and update
+  },
+  updateCommentAvatar: async (author, avatar) => {
+    // find all and update
   }
-
-
-  
 };
 
 export default QaService;

@@ -39,7 +39,8 @@ router.get('/question/:id', async (ctx) => {
     QaService.getQuestionById(ctx.params.id),
     QaService.getAnswersByQuestion(ctx.params.id)
   ]);
-  console.info(question);
+  // console.info(question);
+  console.log(answers);
   ctx.body = {question: question, answers: answers};
 });
 
@@ -144,10 +145,13 @@ router.get('/search', async (ctx) => {
 
 // TODO: 数据
 // 提交答案
-router.post('/answer', async (ctx) => {
-  console.info(ctx.request.body);
-  ctx.body = { code: 0 };
-  // await  QaService.createAnswer()
+router.post('/user/answer', async (ctx) => {
+  console.log(ctx.state.user.id);
+  const user = await UserService.getUserById(ctx.state.user.id);
+  const {answer, qid} = ctx.request.body;
+  const res = await QaService.createAnswer(answer, qid, user);
+  if(res.code != 0) return ctx.body = { code: 1, msg: '发表回答失败,请重新尝试', errors: res.errors};
+  ctx.body = res;
 });
 
 // 提交问题
@@ -330,14 +334,22 @@ router.post('/user/avatarPreUpload', async (ctx) => {
     const { policy, signature } = UserService.genAvatarInfos(info.x, info.y, info.width, info.height);
     ctx.body =  {code: 0, policy: policy, signature:signature}
   } else {
-    ctx.body = { code: 1, msg: '参数不正确'}
+    ctx.body = { code: 1, msg: '上传出错了, 请刷新尝试'}
   }
 });
 
 router.post('/user/avatarUpload', async (ctx) => {
   const url = ctx.request.body.url;
   if (!url) return ctx.body = { code: 1, msg: '图片地址不能为空'};
-  ctx.body = await UserService.updateAvatar(ctx.state.user.id, url);
+  // 修改头像, 同时把所有qa表和comment表遍历一遍, 修改authorAvatar
+  let res = await UserService.updateAvatar(ctx.state.user.id, url);
+  if (res.code != 0)  return ctx.body = res;
+  let user = await UserService.getUserById(ctx.state.user.id);
+  Promise.all([
+    QaService.updateAvatar(user.username, user.info.photoAddress),
+    QaService.updateCommentAvatar(user.username, user.info.photoAddress)
+  ]);
+  ctx.body = res;
 });
 
 

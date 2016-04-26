@@ -35,6 +35,10 @@ const UserSchema = new Schema({
     minlength: [6, '密码最短为6位'],
     maxlength: [25, '密码最长为25位']
   },
+  scores: {
+    type: Number,
+    default: 0
+  },
   isActive: { type: Boolean, default: true },
   isBan: { type: Boolean, default: false },
   isDel: { type: Boolean, default: false },

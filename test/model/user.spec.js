@@ -24,6 +24,7 @@ describe('test user', () => {
       username: 'wynfrith',
       email: 'wangfucheng56@gmail.com',
       password: 'wfc5582563',
+      scores: 888,
       info: {
         brief: '个人简介',
         photoAddress: 'http://my-ghost.b0.upaiyun.com/avator.jpg',

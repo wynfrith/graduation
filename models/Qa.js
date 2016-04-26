@@ -9,6 +9,7 @@ const QaSchema = new Schema({
   id: { type: ObjectId },
   author: { type: String },
   authorId: {type: ObjectId },
+  authorAvatar: {type: String},
   questionId: { type: ObjectId }, // question此值缺省
   type: { type: Boolean }, // true 问题, false 答案
   title: {
@@ -26,7 +27,7 @@ const QaSchema = new Schema({
   comments: [{
     id: { type: ObjectId },
     author: { type: String },
-    avatar: { type: String },
+    authorAvatar: { type: String },
     content: { type: String },
     isDel: { type: Boolean, default: false }
   }]

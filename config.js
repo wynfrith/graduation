@@ -12,6 +12,11 @@ export default {
 
   redis: {
     pass: 111111
-  }
+  },
 
+  upload: {
+    secret: 'FED8RXFfkozna2J+ORen74fxvmg=',
+    bucket: 'graduation',
+    expired: 10000  //ms
+  }
 }

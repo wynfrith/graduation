@@ -4,6 +4,7 @@ import koaJwt from 'koa-jwt'
 import cfg from '../config'
 import sendMail from '../utils/sendMail'
 import captcha from '../utils/captcha';
+import uploadUtil from '../utils/uploadUtil'
 /**
  * Created by wyn on 3/25/16.
  */
@@ -88,6 +89,14 @@ const UserService = {
 
   genCaptcha(number){
     return captcha(number);
+  },
+
+  genAvatarInfos(x, y, width, height) {
+    const savePath = 'avatars/{year}/{mon}/{day}/IMG_{filemd5}{.suffix}';
+    const options = {
+      'x-gmkerl-thumb': `/crop/${width}x${height}a${x}a${y}`
+    };
+    return uploadUtil(savePath, options);
   },
 
   register: async (user) => {

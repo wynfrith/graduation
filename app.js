@@ -30,7 +30,7 @@ app.keys = [cfg.secret];
 // middleware
 app.use(morgan('dev'));
 app.use(cors());
-app.use(convert(koaJwt({ secret: cfg.secret, debug: true}).unless({ path: [
+app.use(convert(koaJwt({ secret: cfg.secret}).unless({ path: [
   // 主页
   '/', '/verify', /^\/admin/,
   // 静态文件

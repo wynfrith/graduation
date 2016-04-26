@@ -63,6 +63,10 @@ router.get('/u/:username/brief', async (ctx) => {
 router.get('/u/:username', async (ctx) => {
   ctx.body = await UserService.getUserByName(ctx.params.username);
 });
+// 通过token获取user信息
+router.get('/user/infos',async (ctx) => {
+  ctx.body = await UserService.getUserById(ctx.state.user.id);
+});
 
 // 获取用户发布的信息汇总
 router.get('/u/:uid/news', async (ctx) => {
@@ -310,9 +314,25 @@ router.post('/user/changeEmail', async (ctx) => {
 
 // 修改个人资料
 router.post('/user/changeProfile', async (ctx) => {
-  const form = ctx.request.body;
-  if(!res) return ctx.body = {code : 1, msg: '请登录'};
-  ctx.body = await UserService.updateInfo(res.id, form.userInfos);
+  const infos =  ctx.request.body.infos;
+  ctx.body = await UserService.updateInfo(ctx.state.user.id, infos);
+});
+
+// 修改头像 , 只获取图片的crop信息 (前端需要验证401和code返回值)
+router.post('/user/avatarPreUpload', async (ctx) => {
+  const info = ctx.request.body;
+  if (info.x && info.y && info.width && info.height) {
+    const { policy, signature } = UserService.genAvatarInfos(info.x, info.y, info.width, info.height);
+    ctx.body =  {code: 0, policy: policy, signature:signature}
+  } else {
+    ctx.body = { code: 1, msg: '参数不正确'}
+  }
+});
+
+router.post('/user/avatarUpload', async (ctx) => {
+  const url = ctx.request.body.url;
+  if (!url) return ctx.body = { code: 0, msg: '图片地址不能为空'};
+  ctx.body = await UserService.updateInfo(ctx.state.user.id, { photoAddress: url })
 });
 
 

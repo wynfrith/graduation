@@ -359,9 +359,12 @@ router.post('/user/reply', async (ctx) => {
 });
 
 // 提交问题
-router.post('/question', async (ctx) => {
-  console.info(ctx.request.body);
-  ctx.body = { code: 0 };
+router.post('/user/question', async (ctx) => {
+  const user = await UserService.getUserById(ctx.state.user.id);
+  const {tagStr, content, title} =ctx.request.body;
+  const res = await QaService.createQuestion(title, content, tagStr.split(';'), user);
+  if(res.code != 0) return ctx.body = { code: 1, msg: '发表问题失败,请重新尝试', errors: res.errors};
+  ctx.body = res;
 });
 
 

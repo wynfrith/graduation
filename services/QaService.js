@@ -7,14 +7,15 @@ import {SaveError, NotFoundError, Ok} from "../utils/error";
 const QaService = {
   // 除了对qa的增删改查, 还包括点踩, 采纳等特殊操作
   
-  createQuestion: async (question, user) => {
-    question = new Qa({
+  createQuestion: async (title, content, tagArray, user) => {
+    const question = new Qa({
       type: true,
       authorId: user._id,
       author: user.username,
       authorAvatar: user.info.photoAddress,
-      title: question.title,
-      content: question.content
+      title: title,
+      content: content,
+      tags: tagArray
     });
     try {
       return Ok(await question.save());

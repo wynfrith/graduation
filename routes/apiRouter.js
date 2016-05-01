@@ -2,6 +2,8 @@ import Router from 'koa-router';
 import UserService from '../services/UserService';
 import QaService from "../services/QaService";
 import TagService from "../services/TagService";
+import CommentService from '../services/CommentService'
+
 import koaJwt from 'koa-jwt'
 import cfg from '../config'
 // rest接口, 提供前端api
@@ -116,8 +118,8 @@ router.get('/u/:username/answers', async (ctx) => {
 
 // 搜索 ( ?text=....&type = ['question', 'user', 'tag'] )
 router.get('/search', async (ctx) => {
-  let limit = ctx.query.limit || 10;
-  let page = ctx.query.page;
+  let limit = +ctx.query.limit || 10;
+  let page = +ctx.query.page;
   let result, count;
   switch (ctx.query.type) {
     case 'question':
@@ -143,22 +145,7 @@ router.get('/search', async (ctx) => {
   
 });
 
-// TODO: 数据
-// 提交答案
-router.post('/user/answer', async (ctx) => {
-  console.log(ctx.state.user.id);
-  const user = await UserService.getUserById(ctx.state.user.id);
-  const {answer, qid} = ctx.request.body;
-  const res = await QaService.createAnswer(answer, qid, user);
-  if(res.code != 0) return ctx.body = { code: 1, msg: '发表回答失败,请重新尝试', errors: res.errors};
-  ctx.body = res;
-});
 
-// 提交问题
-router.post('/question', async (ctx) => {
-  console.info(ctx.request.body);
-  ctx.body = { code: 0 };
-});
 
 // 登陆
 router.post('/login', async (ctx) => {
@@ -351,6 +338,32 @@ router.post('/user/avatarUpload', async (ctx) => {
   ]);
   ctx.body = res;
 });
+
+// TODO: 数据
+// 提交答案
+router.post('/user/answer', async (ctx) => {
+  const user = await UserService.getUserById(ctx.state.user.id);
+  const {answer, qid} = ctx.request.body;
+  const res = await QaService.createAnswer(answer, qid, user);
+  if(res.code != 0) return ctx.body = { code: 1, msg: '发表回答失败,请重新尝试', errors: res.errors};
+  ctx.body = res;
+});
+
+// 评论
+router.post('/user/reply', async (ctx) => {
+  const user = await UserService.getUserById(ctx.state.user.id);
+  const  {content, id} = ctx.request.body;
+  const res = await QaService.createComment(content, id, user);
+  if(res.code != 0) return ctx.body = { code: 1, msg: '发表评论失败,请重新尝试', errors: res.errors};
+  ctx.body = res;
+});
+
+// 提交问题
+router.post('/question', async (ctx) => {
+  console.info(ctx.request.body);
+  ctx.body = { code: 0 };
+});
+
 
 
 // 投票(喜欢点赞)

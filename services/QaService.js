@@ -1,7 +1,5 @@
 import Qa from "../models/Qa";
-import {SaveError} from "../utils/error";
-import {NotFoundError} from "../utils/error";
-import {Ok} from "../utils/error";
+import {SaveError, NotFoundError, Ok} from "../utils/error";
 /**
  * Created by wyn on 3/25/16.
  */
@@ -34,7 +32,6 @@ const QaService = {
       content: answer.content,
       questionId: qid
     });
-    console.log(answer);
     try {
       const question = await Qa.findOne({isDel: false, _id: qid});
       question.answerNum += 1;
@@ -42,6 +39,21 @@ const QaService = {
         question.save(),
         answer.save()
       ]))
+    } catch (err) {
+      return SaveError(err);
+    }
+  },
+  createComment:async (content, id, user) => {
+    const comment = {
+      author: user.username,
+      authorAvatar: user.info.photoAddress,
+      content: content
+    };
+
+    try {
+      const qa = await Qa.findOne({isDel: false, _id: id});
+      qa.comments.push(comment);
+      return Ok(await qa.save());
     } catch (err) {
       return SaveError(err);
     }
@@ -192,7 +204,7 @@ const QaService = {
   
   // 如果是讨厌, isLike为false. 若该答案或问题已被讨厌或喜欢, 则取消
   likeOrHate:async  (qaId, isLike = true) => {
-    let qa = qaId.findOne({isDel: false, _id: qaId});
+    let qa = await qaId.findOne({isDel: false, _id: qaId});
     if (!qa) return NotFoundError();
     if (isLike) {
       qa.like = !qa.like;
@@ -208,10 +220,35 @@ const QaService = {
   },
 
   updateAvatar: async (author, avatar) => {
+    try {
+      let res = await Qa.update({ author: author, isDel: false },
+       { authorAvatar: avatar}, { multi: true });
+      return Ok(res);
+    } catch (err) {
+      return SaveError(err);
+    }
+    
     // find all and update
   },
   updateCommentAvatar: async (author, avatar) => {
-    // find all and update
+    try {
+      // TODO n方基本修改, 日后优化
+      let qa =await Qa.find({ 'comments.author': author, isDel: false }); // TODO: 其中有一条,而不是第一条
+      console.log('qa', qa);
+      for(let i of qa) {
+        i.comments = i.comments.map((comment) => {
+          if (comment.author == author) {
+            comment.authorAvatar = avatar
+          }
+          return comment;
+        });
+        i.save();
+
+      }
+      return Ok(res);
+    } catch (err) {
+      return SaveError(err);
+    }
   }
 };
 

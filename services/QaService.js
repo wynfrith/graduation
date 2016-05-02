@@ -148,7 +148,15 @@ const QaService = {
   },
 
   getQuestionById: async (qid) => {
-    return await Qa.findOne({isDel: false, _id: qid, type: true});
+    let question = await Qa.findOne({isDel: false, _id: qid, type: true});
+    // TODO 浏览量计数, 可换为redis
+    try {
+      question.views += 1;
+      await question.save();
+    } catch(err) {
+      console.log(err);
+    }
+    return question;
   },
 
   getAnswersByQuestion: async (qid) => {
@@ -156,7 +164,7 @@ const QaService = {
   },
   
   
-  getQuestions:async ({page= 1, limit = 10, sort = "", fields = {}} = {}) => {
+  getQuestions:async ({page= 1, limit = 10, tag, sort = "", fields = {}} = {}) => {
     let skip = (page - 1) * limit;
     skip  = skip > 0 ? skip : 0;
 
@@ -165,7 +173,13 @@ const QaService = {
     } else {
       sort = { createdAt: -1 }
     }
+
     let filter = {isDel: false, type: true};
+    if (tag) {
+      filter['tags'] = {
+        "$in": [tag]
+      }
+    }
     return await Promise.all([
       Qa.find(filter , fields ).sort(sort).limit(limit).skip(skip),
       Qa.find(filter).count()
@@ -195,7 +209,7 @@ const QaService = {
     if (!answer) return NotFoundError();
     answer.isAccept = !answer.isAccept;
     try {
-      return Ok(answer.save());
+      return Ok(await answer.save());
     }
      catch (err) {
       return SaveError(err);
@@ -204,16 +218,43 @@ const QaService = {
   },
   
   // 如果是讨厌, isLike为false. 若该答案或问题已被讨厌或喜欢, 则取消
-  likeOrHate:async  (qaId, isLike = true) => {
-    let qa = await qaId.findOne({isDel: false, _id: qaId});
+  likeOrHate:async  (qaId, author, isLike = true) => {
+    let qa = await Qa.findOne({isDel: false, _id: qaId});
     if (!qa) return NotFoundError();
-    if (isLike) {
-      qa.like = !qa.like;
-    } else {
-      qa.hate = !qa.hate
-    }
     try {
-      return Ok(qa.save());
+    let likeIndex = qa.like.indexOf(author);
+    let hateIndex = qa.hate.indexOf(author);
+    if (isLike) {
+      if (hateIndex != -1) { //cancel hate
+        qa.hate.splice(hateIndex, 1);
+        await qa.save();
+        return { code: 0, type: 'hate', status:0, msg:'您取消了踩', username: author }
+      }
+      if (likeIndex == -1) {
+        qa.like.push(author);
+        await qa.save();
+        return {code: 0, type: 'like', status:1, msg: '你赞了一下', username: author }
+      } else {
+        qa.like.splice(likeIndex, 1);
+        await qa.save();
+        return {code: 0, type: 'like', status:0, msg: '你取消了赞', username: author }
+      }
+    } else {
+      if (likeIndex != -1) { //cancel like
+        qa.like.splice(likeIndex, 1);
+        await qa.save();
+        return { code: 0, type: 'like', status:0, msg:'您取消了赞', username: author  }
+      }
+      if (hateIndex == -1) {
+        qa.hate.push(author);
+        await qa.save();
+        return {code: 0, type: 'hate', status:-1, msg: '你踩了一下', username: author }
+      } else {
+        qa.hate.splice(hateIndex, 1);
+        await qa.save();
+        return {code: 0, type: 'hate', status:0, msg: '你取消了踩', username: author }
+      }
+    }
     } catch (err) {
       return SaveError(err);
     }
@@ -235,7 +276,6 @@ const QaService = {
     try {
       // TODO n方基本修改, 日后优化
       let qa =await Qa.find({ 'comments.author': author, isDel: false }); // TODO: 其中有一条,而不是第一条
-      console.log('qa', qa);
       for(let i of qa) {
         i.comments = i.comments.map((comment) => {
           if (comment.author == author) {

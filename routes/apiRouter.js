@@ -12,14 +12,16 @@ export default router;
 
 // 问题列表 TODO: 标签类型
 router.get('/q/list', async (ctx) => {
-  let limit = ctx.query.limit || 3;
+  let limit = ctx.query.limit || 20;
+  let tag = ctx.query.tag || undefined;
   let [questions, count] = await QaService.getQuestions({
     page: ctx.query.page,
     limit: limit,
+    tag: tag,
     sort: ctx.query.sort,
     fields: {tags: 1, answerNum: 1, views: 1, title: 1, author: 1, updatedAt: 1, createdAt: 1, like: 1, hate: 1}
   });
-  ctx.body = { 
+  ctx.body = {
     questions: questions, 
     page: {
       currPage: +ctx.query.page || 1,
@@ -41,8 +43,6 @@ router.get('/question/:id', async (ctx) => {
     QaService.getQuestionById(ctx.params.id),
     QaService.getAnswersByQuestion(ctx.params.id)
   ]);
-  // console.info(question);
-  console.log(answers);
   ctx.body = {question: question, answers: answers};
 });
 
@@ -56,6 +56,10 @@ router.get('/hotTags', async (ctx) => {
   ctx.body = await TagService.getHotTags()
 });
 
+router.get('/tagByName', async (ctx) => {
+  let name = ctx.query.name;
+  ctx.body = await TagService.getTagByName(name);
+});
 
 // 获取用户的摘要信息
 router.get('/u/:username/brief', async (ctx) => {
@@ -241,7 +245,6 @@ router.get('/genCaptchaToken', async(ctx) => {
 // 生成验证码
 router.get('/captcha', async (ctx) => {
   let token = ctx.query.r;
-  console.log('token gen: ', token);
   try {
     const number = koaJwt.verify(token, cfg.secret+'captcha');
     ctx.body = UserService.genCaptcha(number);
@@ -263,9 +266,6 @@ router.post('/findPass', async (ctx) => {
     return ctx.body = { code: 1, msg: '请输入正确的验证码'};
   }
 
-  console.log('token', token);
-  console.log('number', number);
-  console.log('code', code);
   if (code != number) return ctx.body = { code: 1, msg: '请输入正确的验证码'};
   const user = await UserService.getUserByEmail(email);
   if (!user) return ctx.body = { code: 1, msg: '这个邮箱并没有注册'};
@@ -279,11 +279,8 @@ router.post('/findPass', async (ctx) => {
 // 修改密码
 router.post('/user/changePass', async (ctx) => {
   const form = ctx.request.body;
-  console.log(form);
   const user = await UserService.getUserById(ctx.state.user.id);
   if (user.password != form.oldPassword) {
-    console.log(user.password);
-    console.log(form.oldPassword);
     return ctx.body = {code: 1, msg: '原密码错误'}
   }
   if(form.rePassword != form.newPassword) {
@@ -318,6 +315,7 @@ router.post('/user/changeProfile', async (ctx) => {
 router.post('/user/avatarPreUpload', async (ctx) => {
   const info = ctx.request.body;
   if (info.x && info.y && info.width && info.height) {
+    console.log(info);
     const { policy, signature } = UserService.genAvatarInfos(info.x, info.y, info.width, info.height);
     ctx.body =  {code: 0, policy: policy, signature:signature}
   } else {
@@ -370,6 +368,11 @@ router.post('/user/question', async (ctx) => {
 
 
 // 投票(喜欢点赞)
+router.post('/user/vote', async (ctx) => {
+  const user = await UserService.getUserById(ctx.state.user.id);
+  const { qaId, isLike } = ctx.request.body;
+  ctx.body = await QaService.likeOrHate(qaId, user.username, isLike);
+});
 
 
 // 评论

@@ -66,17 +66,16 @@ const TagService = {
   getTagById: async (tagId) => {
     return await Tag.findOne({ isDel: false, _id: tagId });
   },
-  
+
+  getAllTags: async () => {
+    return Tag.find({isDel: false}).sort({createdAt: -1});
+  },
   // 获取parentId下的所有tags
   getTags: async ({ page = 1,limit = 10, sort = { createAt: -1 }, parentId = ''} = {}) => {
     let filter = { isDel: false};
     let skip = (page - 1) * limit;
     skip  = skip > 0 ? skip : 0;
     return Tag.find(filter).skip(skip).limit(limit).sort(sort);
-    // return Promise.all([
-    //   await Tag.find(filter).skip(skip).limit(limit).sort(sort),
-    //   await Tag.find(filter).count()
-    //   ])
   },
 
   searchTags: async(text, {page = 1, limit = 10, sort = {createdAt: -1}} ={}) => {

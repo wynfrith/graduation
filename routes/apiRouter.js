@@ -82,9 +82,9 @@ router.get('/u/:uid/news', async (ctx) => {
 
 // 获取用户提出的问题
 router.get('/u/:username/questions', async (ctx) => {
-  let limit = ctx.query.limit || 10;
+  let limit = +ctx.query.limit || 10;
   let [questions, count] = await QaService.getQuestionsByUser(ctx.params.username, {
-    page: ctx.query.page,
+    page: +ctx.query.page,
     limit: limit
   });
   ctx.body = {
@@ -99,9 +99,9 @@ router.get('/u/:username/questions', async (ctx) => {
 
 // 获取用户回答的答案
 router.get('/u/:username/answers', async (ctx) => {
-  let limit = ctx.query.limit || 10;
+  let limit = +ctx.query.limit || 10;
   let [answers, count] = await QaService.getAnswersByUser(ctx.params.username, {
-    page: ctx.query.page,
+    page: +ctx.query.page,
     limit: limit
   });
   ctx.body = {

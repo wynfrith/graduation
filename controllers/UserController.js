@@ -1,5 +1,6 @@
 
 import UserService from "../services/UserService";
+import QaService from '../services/QaService'
 
 export const list = async ctx =>{
   // ?role=user&isBan=true&search=key12&page=2
@@ -9,7 +10,7 @@ export const list = async ctx =>{
   let [users, userCount] = await UserService.getUsers({
     filter: {
       role: query.role,
-      isBan: query.isBan
+      isBan: query.isBan || false
     },
     search: query.search,
     page: query.page,
@@ -32,8 +33,14 @@ export const list = async ctx =>{
 export const detail = async ctx => {
   let user = await UserService.getUserByName(ctx.params.username);
   if (!user) ctx.redirect('/admin/user');
-  
-  await ctx.render('admin/udetail', {user: user});
+
+  let [ [q], [a] ] = await Promise.all([
+    QaService.getQuestionsByUser(ctx.params.username),
+    QaService.getAnswersByUser(ctx.params.username)
+  ]);
+  console.log(q);
+
+  await ctx.render('admin/udetail', {user: user, q: q, a: a});
 };
 
 const ban = async ctx => {
@@ -75,5 +82,6 @@ const remove = async (ctx) => {
   }
   ctx.body = res;
 };
+
 
 export {ban, unBan, remove}

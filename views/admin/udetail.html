@@ -1,46 +1,95 @@
 {% extends "admin/layout.html" %}
 
+{% block exthead %}
+<style>
+  ul.qas {
+    padding: 10px 20px;
+  }
+  ul.qas li {
+    display: block;
+    padding: 3px;
+  }
+  ul.qas li:after {
+    clear: both;
+    content: ' ';
+    display: block;
+  }
+  ul.qas li p{
+    float: right;
+    margin-right: 300px;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 
 <div class="row">
-    <div class="col-md-4">
-        <div class="card-box">
-            <h4 class="header-title">用户</h4>
-            <ul>
-                <li>头像</li>
-                <li>用户名 链接到该用户</li>
-                <li>邮箱</li>
-                <li>权限</li>
-                <li>状态</li>
-            </ul>
-        </div>
+  <div class="col-md-4">
+    <div class="card-box">
+      <h4 class="header-title">用户信息</h4>
+      <ul>
+        <li>用户名: <a href="/#!/u/{{user.username}}">{{ user.username }}</a></li>
+        <li>邮箱: {{ user.email }}</li>
+        <li>权限: {{ user.role }}</li>
+        <li>状态:
+          {% if user.isBan %}
+          封号
+          {% else %}
+          {% if user.isActive %}
+          已激活
+          {% else%}
+          未激活
+          {% endif %}
+          {% endif %}
+        </li>
+
+      </ul>
     </div>
+  </div>
 </div>
 
 <div class="row">
-    <div class="col-md-12">
-        <div class="card-box">
-            <h4 class="header-title">动态</h4>
-            <span>查询前几条答案, 问题, 评论, 修改信息的情况</span>
-            <span>需要一张独立的表</span>
-        </div>
+  <div class="col-md-12">
+    <div class="card-box">
+      <h4 class="header-title">动态</h4>
+      <span>查询前几条答案, 问题, 评论, 修改信息的情况</span>
+      <span>需要一张独立的表</span>
     </div>
+  </div>
 </div>
 
+{% if q.length > 0 %}
 <div class="row">
-    <div class="col-md-12">
-        <div class="card-box">
-            <h4 class="header-title" style="text-transform: none;">{{ user.username }}的问题</h4>
-        </div>
+  <div class="col-md-12">
+    <div class="card-box">
+      <h4 class="header-title" style="text-transform: none;">{{ user.username }}的问题</h4>
+      <ul class="qas">
+        {% for question in q%}
+        <li>
+          <a href="/#!/q/{{question._id}}" target="_blank">{{ question.title }}</a>
+        </li>
+        {% endfor %}
+      </ul>
     </div>
+  </div>
 </div>
+{% endif %}
 
+{% if a.length > 0 %}
 <div class="row">
-    <div class="col-md-12">
-        <div class="card-box">
-            <h4 class="header-title" style="text-transform: none;">{{ user.username }}的回答</h4>
-        </div>
+  <div class="col-md-12">
+    <div class="card-box">
+      <h4 class="header-title" style="text-transform: none;">{{ user.username }}的回答</h4>
+      <ul class="qas">
+        {% for answer in a%}
+        <li>
+          <a href="/#!/q/{{answer.questionId}}" target="_blank">{{ answer.content }}</a>
+        </li>
+        {% endfor %}
+      </ul>
     </div>
+  </div>
 </div>
+{% endif %}
 
 {% endblock %}

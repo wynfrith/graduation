@@ -11,6 +11,7 @@ const router = new Router({ prefix: '/admin'});
 
 router.get('/', async (ctx) => { await ctx.render('admin/index')});
 
+
 router.get('/user', uList);
 router.get('/user/:username', uDetail);
 router.post('/user/ban', ban);

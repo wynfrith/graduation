@@ -16,10 +16,36 @@ router.get('/verify', async (ctx) => {
   let res = UserService.verifyEmailToken(token);
   if(res) {
     res = await UserService.activeUser(res.id);
-    ctx.redirect('http://127.0.0.1:8080/#!/verify?type=ok')
+    ctx.redirect('/#!/verify?type=ok')
   } else {
-    ctx.redirect('http://127.0.0.1:8080/#!/verify');
+    ctx.redirect('/#!/verify');
   }
+});
+
+router.get('/logout', async (ctx) => {
+  ctx.session.user = null;
+  ctx.redirect('/login');
+});
+router.get('/login', async (ctx) => { await ctx.render('admin/login')});
+router.post('/login', async (ctx) => {
+  let {username, password} = ctx.request.body;
+  if(!username || !password) {
+    return ctx.body = {code: 1, msg: '请输入用户名或密码'}
+  }
+  const user = await UserService.getUserByName(username);
+  if(!user || user.role != 'admin') {
+    return ctx.body = {code: 1, msg: '该用户不存在'}
+  }
+  const isValid = await UserService.isValid(user, password);
+  if(!isValid) {
+    return ctx.body = {code: 1, msg: '密码错误'}
+  }
+  // 加入session
+  ctx.session.user = {
+    username: user.username,
+    avatar: user.info.photoAddress
+  };
+  return ctx.body = { code: 0 };
 });
 
 

@@ -15,10 +15,10 @@
       <ul class="nav navbar-nav navbar-right pull-right">
         <li class="dropdown">
           <a href="" class="dropdown-toggle profile" data-toggle="dropdown" aria-expanded="true">
-            <span>{{ CURRENT_USER.uname }}</span>&nbsp;&nbsp;
-            <img src="/third/images/users/avatar-1.jpg" alt="user-img" class="img-circle"> </a>
+
+            <img src="{{ u.avatar }}" alt="user-img" class="img-circle">&nbsp;&nbsp; <span>{{ u.username }}</span> </a>
           <ul class="dropdown-menu">
-            <li><a href="admin/logout"><i class="ti-power-off m-r-5"></i> 退出</a></li>
+            <li><a href="/logout"><i class="ti-power-off m-r-5"></i> 退出</a></li>
           </ul>
         </li>
       </ul>

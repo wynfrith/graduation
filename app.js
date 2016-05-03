@@ -16,11 +16,13 @@ import adminRouter from './routes/adminRouter';
 import apiRouter from './routes/apiRouter'
 import errorHandler from './middlewares/errorHandler'
 import nunjucks from './middlewares/nunjucks-2'
+import auth from './middlewares/auth'
 
 import dateFilter from './utils/filters/dateFilter'
 import session from 'koa-generic-session'
 // import redisStore from 'koa-redis'
 import MongoStore from 'koa-generic-session-mongo'
+
 
 import cfg from './config'
 
@@ -32,7 +34,7 @@ app.use(morgan('dev'));
 app.use(cors());
 app.use(convert(koaJwt({ secret: cfg.secret}).unless({ path: [
   // 主页
-  '/', '/verify', /^\/admin/,
+  '/', '/verify', '/login','/logout', /^\/admin/,
   // 静态文件
   /^\/css/, /^\/js/, /^\/images/, /^\/third/, /^\/upload/, /^\/frontend/, '/favicon.ico',
   // 不需要验证的api接口
@@ -47,6 +49,9 @@ app.use(favicon(__dirname + '/public/images/favicon.ico'));
 app.use(convert(session({
   store: new MongoStore()
 })));
+
+//后台验证
+app.use(auth('/admin'));
 
 app.use(nunjucks({
   ext: 'html',

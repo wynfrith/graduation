@@ -75,7 +75,7 @@ const QaService = {
   deleteQa:async (id) => {
     try {
       let question = await Qa.findOneAndUpdate(
-        {isDel:false, _id: uid}, {isDel: true}, {runValidators: true});
+        {isDel:false, _id: id}, {isDel: true});
       return !!question ? Ok(question) : NotFoundError();
     } catch (err) {
       return SaveError(err)
@@ -85,7 +85,7 @@ const QaService = {
   //注意不可修改字段
   updateQuestion:async  (qid, question) => {
     try {
-      let questioin = await Qa.findOneAndUpdate(
+      let question = await Qa.findOneAndUpdate(
         {isDel: false, _id: qid}, {
           title: question.title,
           content: question.content,

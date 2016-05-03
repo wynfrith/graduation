@@ -1,5 +1,100 @@
 {% extends "admin/layout.html" %}
 
+{% block extscript %}
+
+<script>
+  // modal框控制
+  $(function () {
+
+    $('.addBtn').on('click', function () {
+      $('.addModal input[name=name]').val('');
+      $('.addModal textarea[name=memo]').val('');
+      $('.addModal').modal('show');
+
+    });
+    $('.tagsTable tr')
+        .on('click', '.editBtn', function (e) {
+          var $tr = $(e.delegateTarget);
+          $('.editModal input[name=name]').val($tr.find('.nameBox').text());
+          $('.editModal textarea[name=memo]').val($tr.find('.memoBox').text());
+          $('.editModal .subBtn').data('id', $tr.data('id'));
+          $('.editModal').modal('show');
+        })
+        .on('click', '.removeBtn', function (e){
+          var $tr = $(e.delegateTarget);
+          $('.removeModal .removeTagName').text($tr.find('.nameBox').text());
+          $('.removeModal .subBtn').data('id', $tr.data('id'));
+          $('.removeModal').modal('show');
+        });
+
+    // 添加tag
+    $('.addModal .subBtn').on('click', function () {
+      $.ajax({
+        url: '/admin/tag/add',
+        method: 'post',
+        data: {
+          name: $('.addModal input[name=name]').val(),
+          memo: $('.addModal textarea[name=memo]').val()
+        }
+      }).success(function(data) {
+        if (data.code == 0) {
+          $app.notify('添加成功');
+          setTimeout(function() {
+            location.reload();
+          }, 200);
+        } else {
+          $app.notify(data.msg);
+        }
+      })
+    });
+
+    // 修改tag
+    $('.editModal .subBtn').on('click', function () {
+      $.ajax({
+        url: '/admin/tag/edit',
+        method: 'post',
+        data: {
+          name: $('.editModal input[name=name]').val(),
+          memo: $('.editModal textarea[name=memo]').val(),
+          id: $('.editModal .subBtn').data('id')
+        }
+      }).success(function(data) {
+        if (data.code == 0) {
+          $app.notify('修改成功');
+          setTimeout(function() {
+            location.reload();
+          }, 200);
+        } else {
+          $app.notify(data.msg || '修改失败');
+        }
+      })
+    });
+
+    // 删除tag
+    $('.removeModal .subBtn').on('click', function () {
+      $.ajax({
+        url: '/admin/tag/remove',
+        method: 'post',
+        data: {
+          id: $('.removeModal .subBtn').data('id')
+        }
+      }).success(function(data) {
+        if (data.code == 0) {
+          $app.notify('删除成功');
+          setTimeout(function() {
+            location.reload();
+          }, 200);
+        } else {
+          $app.notify(data.msg  || '删除失败');
+        }
+      })
+    });
+  });
+</script>
+
+{% endblock %}
+
+
 {% block content %}
 
 {% set colors = [ 'success', 'warning', 'info', 'default'] %}
@@ -8,32 +103,113 @@
   <h4 class="page-title">标签管理</h4>
 </div>
 
-<div class="row">
-  <div class="col-xs-12">
-    <button class="btn btn-success">添加新标签</button>
+
+  <div class="row" style="margin-bottom: 15px;">
+    <div class="col-xs-12">
+      <!-- 添加 模态框-->
+      <div class="addModal modal fade" tabindex="-1" role="dialog" aria-labelledby="add-modalLabel" aria-hidden="true"
+           style="display: none;">
+        <div class="modal-dialog" style="width:55%;">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+              <h4 class="modal-title" id="add-modalLabel">添加标签</h4>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-xs-12">
+                  <div class="form-group">
+                    <label for="tagName" class="control-label">标签名称</label>
+                    <input type="text" name="name" placeholder="输入标签的名称" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label for="tagMemo" class="control-label">标签描述</label>
+                  <textarea class="form-control autogrow" name="memo" placeholder="输入标签的概要"
+                            style="overflow: hidden; word-wrap: break-word; resize: vertical; height: 104px;"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer" style="border-top: none; padding: 0;">
+              <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">关闭</button>
+              <button type="button" class="btn btn-primary waves-effect waves-light subBtn">添加</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 修改 模态框-->
+      <div class="editModal modal fade" tabindex="-1" role="dialog" aria-labelledby="edit-modalLabel" aria-hidden="true"
+           style="display: none;">
+        <div class="modal-dialog" style="width:55%;">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+              <h4 class="modal-title" id="edit-modalLabel">修改标签</h4>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-xs-12">
+                  <div class="form-group">
+                    <label class="control-label">标签名称</label>
+                    <input type="text" name="name" placeholder="输入标签的名称" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label">标签描述</label>
+                  <textarea class="form-control autogrow" name="memo" placeholder="输入标签的概要"
+                            style="overflow: hidden; word-wrap: break-word; resize: vertical; height: 104px;"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer" style="border-top: none; padding: 0;">
+              <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">关闭</button>
+              <button type="button" class="btn btn-primary waves-effect waves-light subBtn">修改</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!--删除-->
+      <div class="removeModal modal fade" tabindex="-1" role="dialog" aria-labelledby="remove-modalLabel" aria-hidden="true"
+           style="display: none;">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+            <div class="modal-body">
+              <p>你确定要删除 <span class="removeTagName"></span> 标签吗?</p>
+            </div>
+            <div class="modal-footer" style="border-top: none; padding: 0;">
+              <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">取消</button>
+              <button type="button" class="btn btn-danger waves-effect waves-light subBtn">删除</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-default waves-effect waves-light addBtn">添加标签</button>
+    </div>
   </div>
-</div>
+
 <div class="row">
   <div class="col-xs-12">
     <div class="card-box">
       <table class="table table-striped">
         <thead>
-          <tr>
-            <th>名称</th>
-            <th>描述</th>
-            <th>操作</th>
-          </tr>
+        <tr>
+          <th>名称</th>
+          <th>描述</th>
+          <th>操作</th>
+        </tr>
         </thead>
-        <tbody>
+        <tbody class="tagsTable">
         {% for tag in tags %}
-          <tr>
-            <td><span class="label label-table label-{{ colors | random }}">{{ tag.name }}</span></td>
-            <td>{{ tag.memo }}</td>
-            <td>
-              <button class="btn btn-xs btn-success">修改</button>
-              <button class="btn btn-xs btn-danger">删除</button>
-            </td>
-          </tr>
+        <tr data-id="{{ tag._id }}">
+          <td><span class="nameBox label label-table label-{{ colors | random }}">{{ tag.name }}</span></td>
+          <td class="memoBox">{{ tag.memo }}</td>
+          <td>
+            <button class="btn btn-xs btn-success editBtn">修改</button>
+            <button class="btn btn-xs btn-danger removeBtn">删除</button>
+          </td>
+        </tr>
         {% endfor%}
         </tbody>
       </table>

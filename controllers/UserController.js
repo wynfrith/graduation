@@ -4,7 +4,7 @@ import UserService from "../services/UserService";
 export const list = async ctx =>{
   // ?role=user&isBan=true&search=key12&page=2
   const query = ctx.query;
-  const limit = 3;
+  const limit = 10;
   
   let [users, userCount] = await UserService.getUsers({
     filter: {
@@ -24,7 +24,8 @@ export const list = async ctx =>{
     page: query.page || 1,
     pageNum: Math.ceil(userCount / limit),
     searchText: query.search,
-    typeName: typeName
+    typeName: typeName,
+    isInvalid: query.isBan
   })
 };
 
@@ -34,3 +35,45 @@ export const detail = async ctx => {
   
   await ctx.render('admin/udetail', {user: user});
 };
+
+const ban = async ctx => {
+  let {ids} = ctx.request.body;
+  ids = ids.split(';');
+  let res = {code: 0};
+  for(let id of ids) {
+    res = await UserService.banUser(id);
+    if (res.code > 0 ) {
+      break;
+    }
+  }
+  ctx.body = res;
+  
+};
+
+const unBan = async (ctx) => {
+  let {ids} = ctx.request.body;
+  ids = ids.split(';');
+  let res = {code: 0};
+  for(let id of ids) {
+    res = await UserService.unBanUser(id);
+    if (res.code > 0 ) {
+      break;
+    }
+  }
+  ctx.body = res;
+};
+
+const remove = async (ctx) => {
+  let {ids} = ctx.request.body;
+  ids = ids.split(';');
+  let res = {code: 0};
+  for(let id of ids) {
+    res = await UserService.deleteUser(id);
+    if (res.code > 0 ) {
+      break;
+    }
+  }
+  ctx.body = res;
+};
+
+export {ban, unBan, remove}

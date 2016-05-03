@@ -20,15 +20,16 @@ const TagService = {
 
   // 移除tag首先检查有没有子标签
   deleteTag: async (tagId) => {
-    let tag = await Tag.findOne({is_del: false, _id: tagId});
+    let tag = await Tag.findOne({isDel: false, _id: tagId});
+    console.log(tag);
     if(!tag) return NotFoundError();
 
-    let count = await Tag.count({is_del: false, parentId: tagId});
+    let count = await Tag.count({isDel: false, parentId: tagId});
     if (count > 0) {
       return ConstraintsError();
     } else {
       try {
-        return Ok(await Tag.update({_id: tagId}, {is_del: true}));
+        return Ok(await Tag.update({_id: tagId}, {isDel: true}));
       } catch (err){
         return SaveError(err);
       }
@@ -37,13 +38,13 @@ const TagService = {
 
   // 移除摸个标签, 并且递归移除子标签
   deleteTagForce: async (tagId) => {
-    let tag = await Tag.findOne({is_del: false, _id: tagId});
+    let tag = await Tag.findOne({isDdel: false, _id: tagId});
     if(!tag) return NotFoundError();
 
-    let children = await Tag.find({is_del: false, parentId: tagId});
+    let children = await Tag.find({isDel: false, parentId: tagId});
     const tasks = [];
     for (let child of children) {
-      let task = Tag.remove({is_del:false, _id: child._id});
+      let task = Tag.remove({isDel:false, _id: child._id});
       tasks.push(task);
     }
     await Promise.all(tasks);
@@ -51,9 +52,9 @@ const TagService = {
 
   updateTag:async (tagId, tag) => {
     try {
-      let tag = await Tag.findOneAndUpdate(
+      let res = await Tag.findOneAndUpdate(
         {isDel: false, _id: tagId }, tag ,{runValidators: true});
-      return Ok(tag);
+      return Ok(res);
     } catch (err) {
       return SaveError(err);
     }

@@ -1,10 +1,148 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "admin/layout.html" %}
 
-</body>
-</html>
+{% block exthead %}
+<style>
+  td a {
+    color: #85ad8e;
+  }
+  td a:hover {
+    color: #85ad8e;
+    text-decoration: underline;
+  }
+</style>
+{% endblock %}
+
+{% block extscript %}
+<script>
+  //搜索
+  $('#searchText').on('keypress', function(e) {
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      var text = $('#searchText');
+      $app.search(text.val(), true);
+    }
+  });
+  $('#searchBtn').on('click', function() {
+    var text = $('#searchText');
+    $app.search(text.val(), true);
+  });
+
+  // 翻页
+  $('#prevPage').on('click', function() { $app.appendQs({page: $('#prevPage').data('page')}) })
+  $('#nextPage').on('click', function() { $app.appendQs({page: $('#nextPage').data('page')}) })
+  $('#jumpPage').on('click', function() {
+    var page = $('#jumpPageInput').val();
+    if (!page) {
+    } else if (page < 1 || page > {{ pageNum }}) {
+      $app.notify('超过最大允许数值')
+    } else if (!!isNaN(page)) {
+      $app.notify('您输入的数字不合法')
+    } else {
+      $app.appendQs({page: page})
+    }
+  });
+
+  $('table tr').on('click', '.removeBtn', function (e){
+     var $tr = $(e.delegateTarget);
+     $('.removeModal .subBtn').data('id', $tr.data('id'));
+     $('.removeModal').modal('show');
+  });
+
+  // 删除
+  $('.removeModal .subBtn').on('click', function () {
+    var $tr = $('tr[data-id="'+ $(this).data('id') +'"]');
+    $.ajax({
+      url: '/admin/question/remove',
+      method: 'post',
+      data: {
+        id: $('.removeModal .subBtn').data('id')
+      }
+    }).success(function(data) {
+      if(data.code == 0) {
+        $('.removeModal').modal('hide');
+        $app.notify('删除成功');
+       $tr.remove();
+      } else {
+        $app.notify(data.msg || '删除失败');
+      }
+    });
+  });
+
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <h4 class="page-title">问答管理</h4>
+</div>
+<div class="row">
+  <div class="col-xs-12">
+    <div class="card-box">
+      <div class="row">
+        <div class="col-sm-4">
+          <form class="form">
+            <div class="form-group">
+              <div class="input-group">
+                <input type="text" class="form-control" placeholder="搜索问题" id="searchText" value="{{ searchText }}">
+          <span class="input-group-btn">
+            <button type="button" id="searchBtn" class="btn waves-effect waves-light btn-white">搜索</button>
+          </span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <table class="table table-hover">
+        <thead>
+        <tr>
+          <th>问题标题</th>
+          <th>答案数</th>
+          <th>投票数</th>
+          <th>最后操作日期</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody >
+        {% for question in questions %}
+        <tr data-id="{{ question._id }}">
+          <td><a href="/#!/q/{{ question._id }}" target="_blank">{{ question.title }}</a></td>
+          <td>{{ question.answerNum }}</td>
+          <td>{{ question.score }}</td>
+          <td>{{ question.updatedAt | dateFilter('yyyy-MM-dd hh:mm:ss') }}</td>
+          <td>
+            <button class="btn btn-xs btn-danger removeBtn">删除</button>
+          </td>
+        </tr>
+        {% endfor%}
+        </tbody>
+      </table>
+      <div class="pagination">
+          <span class="page-nav">
+            <a href="javascript:;" class="btn btn-white {{ 'disabled' if page == 1 }}" id="prevPage" data-page={{+page - 1}}><i class=" ti-angle-left"></i></a>
+            <span class="page-num"> {{page}} / {{ pageNum if pageNum != 0 else '1'}} </span>
+            <a href="javascript:;" class="btn btn-white {{ 'disabled' if page == pageNum }}" id="nextPage" data-page={{+page + 1}}><i class=" ti-angle-right"></i></a>
+          </span>
+          <span class="go-page">
+            <input type="text" class="" id="jumpPageInput">
+            <a href="javascript:;" class="btn btn-white" id="jumpPage">跳转</a>
+          </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="removeModal modal fade" tabindex="-1" role="dialog" aria-labelledby="remove-modalLabel" aria-hidden="true"
+     style="display: none;">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-body">
+        <p>你确定要删除这篇文章吗?</p>
+      </div>
+      <div class="modal-footer" style="border-top: none; padding: 0;">
+        <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-danger waves-effect waves-light subBtn">删除</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

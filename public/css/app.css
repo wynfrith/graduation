@@ -17,3 +17,26 @@
   color: #fff;
   transition: margin ease-in-out .2s;
 }
+
+.pagination {
+  margin: 5px 0;
+}
+.page-nav, .go-page {
+  margin: 0 15px;
+}
+.pagination .btn {
+  padding: 4px 6px;
+}
+.pagination .page-num {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 0 3px;
+}
+.pagination .go-page input{
+  border: 1px solid #eaeaea;
+  border-radius: 3px;
+  padding: 4px 12px;
+  display: inline-block;
+  vertical-align: middle;
+  width: 60px;
+}

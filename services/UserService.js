@@ -151,6 +151,26 @@ const UserService = {
     }
   },
 
+  banUser: async (uid) => {
+    try {
+      let user = await User.findOneAndUpdate(
+        {isDel: false, _id: uid}, {isBan: true}
+      );
+      return Ok(user)
+    } catch (err) {
+      return SaveError(err)
+    }
+  },
+  unBanUser: async (uid) => {
+    try {
+      let user = await User.findOneAndUpdate(
+        {isDel: false, _id: uid}, {isBan: false}
+      );
+      return Ok(user)
+    } catch (err) {
+      return SaveError(err)
+    }
+  },
   deleteUser: async (uid) => {
     try {
       let user = await User.findOneAndUpdate(

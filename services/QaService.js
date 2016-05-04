@@ -228,31 +228,31 @@ const QaService = {
       if (hateIndex != -1) { //cancel hate
         qa.hate.splice(hateIndex, 1);
         await qa.save();
-        return { code: 0, type: 'hate', status:0, msg:'您取消了踩', username: author }
+        return {data:{ code: 0, type: 'hate', status:0, msg:'您取消了踩', username: author}, qa: qa}
       }
       if (likeIndex == -1) {
         qa.like.push(author);
         await qa.save();
-        return {code: 0, type: 'like', status:1, msg: '你赞了一下', username: author }
+        return {data:{code: 0, type: 'like', status:1, msg: '你赞了一下', username: author }, qa:qa}
       } else {
         qa.like.splice(likeIndex, 1);
         await qa.save();
-        return {code: 0, type: 'like', status:0, msg: '你取消了赞', username: author }
+        return {data:{code: 0, type: 'like', status:0, msg: '你取消了赞', username: author }, qa:qa}
       }
     } else {
       if (likeIndex != -1) { //cancel like
         qa.like.splice(likeIndex, 1);
         await qa.save();
-        return { code: 0, type: 'like', status:0, msg:'您取消了赞', username: author  }
+        return {data:{ code: 0, type: 'like', status:0, msg:'您取消了赞', username: author  }, qa:qa}
       }
       if (hateIndex == -1) {
         qa.hate.push(author);
         await qa.save();
-        return {code: 0, type: 'hate', status:-1, msg: '你踩了一下', username: author }
+        return {data:{code: 0, type: 'hate', status:-1, msg: '你踩了一下', username: author }, qa:qa}
       } else {
-        qa.hate.splice(hateIndex, 1);
+        qa.hate.splice(hateIndex, 1); 
         await qa.save();
-        return {code: 0, type: 'hate', status:0, msg: '你取消了踩', username: author }
+        return {data:{code: 0, type: 'hate', status:0, msg: '你取消了踩', username: author }, qa:qa}
       }
     }
     } catch (err) {

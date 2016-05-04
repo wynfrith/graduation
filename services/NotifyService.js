@@ -53,7 +53,7 @@ class NotifyService {
   static async pullRemind (userId) {
     //首先找出最后一条userNotify提醒
     const last = await UserNotify.findOne({userId: userId}).sort({createdAt: -1});
-    let filter = { receiver: userId, type: 'remind'};
+    let filter = { receiver: userId, type: 'remind', sender: { $ne: userId}};
     if (last) filter['createdAt'] = {  $gt: last.createdAt };
     /// 获取大约最后一条时间的该用户订阅的所有notify
     const notifies = await Notify.find(filter);
@@ -91,47 +91,49 @@ class NotifyService {
     await Promise.all(events);
   }
 
+  static async sendMessage(content, sender, receiver) {
+    if (sender.toString()== receiver.toString()){
+      return false;
+    }
+    let notify = new Notify({
+      type: 'message',
+      content: content,
+      sender: sender, // id
+      receiver: receiver // id
+    });
+    notify = await notify.save();
+    const userNotify = new UserNotify({
+      content: content,
+      isRead: false,
+      userId: notify.receiver,
+      notifyId: notify._id,
+      notifyType: notify.type
+    });
+    await userNotify.save();
+  }
+
   static async getUserNotify(userId) {
-    return await UserNotify.find({userId: userId});
+    return await UserNotify.find({userId: userId}).sort({createdAt: -1});
+  }
+
+  static async getReadNotifyCount(userId) {
+    return await UserNotify.count({isRead: false});
   }
 
   static async readNotify (nid) {
-    try {
-      return Ok(await UserNotify.findOneAndUpdate({_id: nid}, { isRead: true}))
-    } catch(err) {
-      return SaveError(err);
+    const notify = await UserNotify.findOne({id: nid, isRead: false});
+    if (notify) {
+      notify.isRead = true;
+      return Ok(await notify.save())
+    } else {
+      return {code: 1}
     }
   }
 
+  static async readAllNotify (userId) {
+    return await UserNotify.update({userId: userId, isRead: false}, { isRead: true }, {multi: true})
+  }
+
 }
-// const NotifyService = {
-//
-//   // 订阅
-//   subscribe: async () => {},
-//
-//   // 这三个方法会创建不同类型的notify
-//   createAnnounce: (content, sender) => {},
-//   createRemind: (content, sender, target, targetType, action) => {},
-//   createMessage: (content, sender, receiver) => {},
-//
-//
-//   //从Notify拉取消息到UserNotify中
-//   pullAnnounce: (userId) => {},
-//   pullRemind: (userId) => {},
-//   pullAll: (userId) => {},
-//
-//
-//   /**
-//    * 获取用户的UserNotify列表
-//    * @param userId
-//    */
-//   getUserNotify: (userId) => {},
-//
-//   /**
-//    * 更新某一条通知, 把isRead设为true
-//    * @param userId
-//    * @param notifyId
-//    */
-//   readNotify:(userId, notifyId) => {}
-// };
+
 export default NotifyService;

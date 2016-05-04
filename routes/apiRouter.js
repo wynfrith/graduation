@@ -13,7 +13,7 @@ export default router;
 
 // 问题列表 TODO: 标签类型
 router.get('/q/list', async (ctx) => {
-  let limit = ctx.query.limit || 20;
+  let limit = ctx.query.limit || 10;
   let tag = ctx.query.tag || undefined;
   let [questions, count] = await QaService.getQuestions({
     page: ctx.query.page,
@@ -348,10 +348,10 @@ router.post('/user/answer', async (ctx) => {
     return ctx.body = { code: 1, msg: '发表回答失败,请重新尝试', errors: res.errors};
   }
   // 为所有订阅该答案的人创建通知
-  NotifyService.createRemind(res.data.questionId, 'question', user._id, 'answer',
-    `<a href="#!/u/${user.username}">${user.username}</a> 回答了问题 <a href="#!/q/${res.data.questionId}">`);
-  // 订阅问题
-  NotifyService.subscribe(ctx.state.user._id,res.data.questionId, 'question');
+  await NotifyService.createRemind(res.data[0]._id, 'question', ctx.state.user.id, 'answer',
+    `<a href="#!/u/${user.username}">${user.username}</a> 回答了问题 <a href="#!/q/${res.data[0]._id}">${res.data[0].title}</a>`);
+  // 订阅问题 res.data[0]是一个question实例
+  await NotifyService.subscribe(ctx.state.user.id,res.data[0]._id, 'question');
   ctx.body = res;
 });
 
@@ -373,7 +373,7 @@ router.post('/user/question', async (ctx) => {
     return ctx.body = { code: 1, msg: '发表问题失败,请重新尝试', errors: res.errors};
   }
   // 订阅这个问题
-  NotifyService.subscribe(ctx.state.user._id,res.data._id, 'question');
+  await NotifyService.subscribe(ctx.state.user.id,res.data._id, 'question');
   ctx.body = res;
 });
 
@@ -383,7 +383,32 @@ router.post('/user/question', async (ctx) => {
 router.post('/user/vote', async (ctx) => {
   const user = await UserService.getUserById(ctx.state.user.id);
   const { qaId, isLike } = ctx.request.body;
-  ctx.body = await QaService.likeOrHate(qaId, user.username, isLike);
+
+  
+  const res = await QaService.likeOrHate(qaId, user.username, isLike);
+  if (res.data.status == 0) {
+    return ctx.body = res.data;
+  }
+  
+  const qa = res.qa;
+  const action = isLike ? ' 赞' : '踩';
+    
+  const params =qa.questionId ? {
+    id: qa.questionId,
+    content: qa.content > 25 ? qa.content.substring(0, 25) + '...' : qa.content,
+    type: '回答'
+  } : {
+    id: qa._id,
+    content: qa.title  > 25 ? qa.title.substring(0, 25) + '...': qa.title,
+    type: '问题'
+  };
+
+  //TODO: 因为目标是一人, 直接向投票的人发送消息
+  const msg = `<a href="#!/u/${user.username}">${user.username}</a> ${action}了您的${params.type} <a href="#!/q/${params.id}">${params.content}</a>`;
+  console.log(msg);
+  await NotifyService.sendMessage(msg, user._id, qa.authorId);
+  ctx.body = res.data;
+
 });
 
 
@@ -394,7 +419,7 @@ router.post('/user/pullNotify', async (ctx) => {
     NotifyService.pullAnnounce(ctx.state.user.id),
     NotifyService.pullRemind(ctx.state.user.id)
   ]);
-  ctx.body = ''
+  ctx.body = await NotifyService.getReadNotifyCount(ctx.state.user.id);
 });
 
 // 获取用户通知列表
@@ -408,6 +433,10 @@ router.post('/user/notifies/read', async (ctx) => {
   ctx.body = await  NotifyService.readNotify(nid);
 });
 
+router.post('/user/notifies/readAll', async (ctx) => {
+  const { nid } = ctx.request.body;
+  ctx.body = await  NotifyService.readAllNotify(ctx.state.user.id);
+});
 
 
 

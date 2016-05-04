@@ -11,7 +11,7 @@ import cfg from '../config'
 const router = new Router({ prefix: '/api'});
 export default router;
 
-// 问题列表 TODO: 标签类型
+// 问题列表
 router.get('/q/list', async (ctx) => {
   let limit = ctx.query.limit || 10;
   let tag = ctx.query.tag || undefined;
@@ -167,7 +167,6 @@ router.post('/login', async (ctx) => {
   if(!isValid) {
     return ctx.body = { code: 1, msg: '密码错误'}
   }
-  // TODO: 生成 token, 并写入session或local storage
   // console.info('登陆: ',user);
   const token = UserService.genToken(user);
   ctx.body = { code: 0, token: token };
@@ -338,7 +337,6 @@ router.post('/user/avatarUpload', async (ctx) => {
   ctx.body = res;
 });
 
-// TODO: 数据
 // 提交答案
 router.post('/user/answer', async (ctx) => {
   const user = await UserService.getUserById(ctx.state.user.id);

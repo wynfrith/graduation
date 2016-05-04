@@ -4,7 +4,6 @@ import timestamp from 'mongoose-timestamp'
 const Schema = mongoose.Schema,
   ObjectId = Schema.ObjectId;
 
-//TODO: 限制tag,不允许传入非法tag
 const QaSchema = new Schema({
   id: { type: ObjectId },
   author: { type: String },

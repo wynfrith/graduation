@@ -77,10 +77,10 @@ router.get('/user/infos',async (ctx) => {
 });
 
 // 获取用户发布的信息汇总
-router.get('/u/:uid/news', async (ctx) => {
+router.get('/u/:username/news', async (ctx) => {
   let [questions, answers] = await Promise.all([
-    QaService.getQuestionsByUser(ctx.params.uid, {limit: 5}),
-    QaService.getAnswersByUser(ctx.params.uid, {limit: 5})
+    QaService.getQuestionsByUser(ctx.params.username, {limit: 5}),
+    QaService.getAnswersByUser(ctx.params.username, {limit: 5})
   ]);
   ctx.body = { questions: questions[0], answers: answers[0] };
 });
@@ -403,7 +403,6 @@ router.post('/user/vote', async (ctx) => {
     type: '问题'
   };
 
-  //TODO: 因为目标是一人, 直接向投票的人发送消息
   const msg = `<a href="#!/u/${user.username}">${user.username}</a> ${action}了您的${params.type} <a href="#!/q/${params.id}">${params.content}</a>`;
   console.log(msg);
   await NotifyService.sendMessage(msg, user._id, qa.authorId);

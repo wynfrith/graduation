@@ -120,11 +120,12 @@ const QaService = {
 
   getQuestionsByUser:async  (username, {
     page = 1,
-    limit = 10,
+    limit = 5,
     sort = { createAt: -1 }
   } = {}) => {
     let skip = (page - 1) * limit;
     skip  = skip > 0 ? skip : 0;
+    console.log('limit'+limit);
 
     let filters = {isDel: false, author: username, type: true};
     return await Promise.all([

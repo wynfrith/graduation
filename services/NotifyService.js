@@ -100,7 +100,7 @@ class NotifyService {
   }
 
   static async sendMessage(content, sender, receiver) {
-    if (sender.toString()== receiver.toString()){
+    if (sender && sender.toString()== receiver.toString()){
       return false;
     }
     let notify = new Notify({

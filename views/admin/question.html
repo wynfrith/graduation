@@ -96,9 +96,10 @@
         <thead>
         <tr>
           <th>问题标题</th>
+          <th>作者</th>
           <th>答案数</th>
           <th>投票数</th>
-          <th>最后操作日期</th>
+          <th>最后修改日期</th>
           <th>操作</th>
         </tr>
         </thead>
@@ -106,6 +107,7 @@
         {% for question in questions %}
         <tr data-id="{{ question._id }}">
           <td><a href="/#!/q/{{ question._id }}" target="_blank">{{ question.title }}</a></td>
+          <td><a href="/admin/user/{{question.author}}">{{ question.author}}</a></td>
           <td>{{ question.answerNum }}</td>
           <td>{{ question.score }}</td>
           <td>{{ question.updatedAt | dateFilter('yyyy-MM-dd hh:mm:ss') }}</td>

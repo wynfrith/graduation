@@ -148,7 +148,7 @@ const QaService = {
   },
 
   getQuestionById: async (qid) => {
-    let question = await Qa.findOne({isDel: false, _id: qid, type: true});
+    let question = await Qa.findOne({_id: qid, type: true});
     // TODO 浏览量计数, 可换为redis
     try {
       question.views += 1;

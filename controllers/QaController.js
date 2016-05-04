@@ -1,4 +1,5 @@
 import QaService from "../services/QaService";
+import NotifyService from '../services/NotifyService';
 
 const list = async (ctx) => {
   const query = ctx.query;
@@ -28,7 +29,10 @@ const list = async (ctx) => {
 // 删除问题或答案
 const remove = async (ctx) => {
   const { id } = ctx.request.body;
-  console.log(id);
+  const question = await QaService.getQuestionById(id);
+
+  const msg = `您的问题 <a href="#!/q/${question._id}">${question.title}</a> 已被管理员删除!`;
+  await NotifyService.sendMessage(msg, null, question.authorId);
   ctx.body = await QaService.deleteQa(id);
 };
 

@@ -40,13 +40,17 @@ class NotifyService {
     await Promise.all(events);
   }
   
-  static async createAnnounce(sender, content) {
+  static async createAnnounce(username, content) {
     let notify = new Notify({
       content: content,
       type: 'announce',
-      sender: sender
+      senderName: username
     });
-    await notify.save();
+    try {
+      return Ok(await notify.save());
+    } catch(err) {
+      return SaveError(err);
+    }
   }
 
   // 拉取一个用户的用户提醒
@@ -77,14 +81,18 @@ class NotifyService {
     const last = await UserNotify.findOne({userId: userId}).sort({createdAt: -1});
     let filter = { type: 'announce'};
     if (last) filter['createdAt'] = {  $gt: last.createdAt };
+    // console.log(last.createdAt);
+    // const notifies = await Notify.find(filter);
     const notifies = await Notify.find(filter);
+    console.log(notifies);
     const events = [];
     for (let notify of notifies){
       let userNotify = new UserNotify({
         content: notify.content,
         isRead: false,
         notifyId: notify._id,
-        notifyType: notify.type
+        notifyType: notify.type,
+        userId: userId
       });
       events.push(userNotify.save());
     }
@@ -111,17 +119,22 @@ class NotifyService {
     });
     await userNotify.save();
   }
-
+  static async getAnnounces() {
+    return await Notify.find({type: 'announce'}).sort({createdAt: -1});
+  }
+  
   static async getUserNotify(userId) {
+    // return await UserNotify.find({userId: userId}).sort({createdAt: -1});
     return await UserNotify.find({userId: userId}).sort({createdAt: -1});
   }
 
   static async getReadNotifyCount(userId) {
-    return await UserNotify.count({isRead: false});
+    return await UserNotify.count({isRead: false, userId: userId});
   }
 
   static async readNotify (nid) {
-    const notify = await UserNotify.findOne({id: nid, isRead: false});
+    const notify = await UserNotify.findOne({_id: nid, isRead: false});
+    console.log(notify);
     if (notify) {
       notify.isRead = true;
       return Ok(await notify.save())

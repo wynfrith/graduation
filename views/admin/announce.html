@@ -1,0 +1,87 @@
+{% extends "admin/layout.html" %}
+
+{% block exthead %}
+
+{% endblock %}
+
+{% block extscript %}
+<script>
+  $(function() {
+    $('form').submit(function(e) {
+      e.preventDefault();
+      var text = $('input[name=text]').val();
+      if (text.trim().length > 5) {
+        $.ajax({url: '/admin/announce', method: 'post', data: { text: text }})
+            .success(function(data) {
+              if(data.code == 0) {
+                $app.notify('发布公告成功!');
+                setTimeout(function() {
+                  location.reload()
+                }, 200);
+              } else {
+                $app.notify(data.msg || '发布失败');
+              }
+            })
+      } else if (text.trim() == 0 ){
+        $app.notify('请输入点东西吧..')
+      } else {
+        $app.notify('长度过短, 最少需要5个字符')
+      }
+    })
+  })
+</script>
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <h4 class="page-title">公告管理</h4>
+</div>
+
+<div class="row">
+  <div class="col-xs-12">
+    <div class="card-box">
+      <div class="row">
+        <div class="col-xs-10">
+          <form id="form" action="">
+            <div class="form-group">
+              <div class="input-group">
+                <input type="text" class="form-control" placeholder="网站公告" name="text">
+                <span class="input-group-btn">
+                <button class="btn btn-default" type="submit">发送新公告</button>
+            </span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="row">
+
+        <div class="col-xs-12">
+          <table class="table">
+            <thead>
+            <tr>
+              <th>公告内容</th>
+              <th>发送人</th>
+              <th>发送时间</th>
+            </tr>
+            </thead>
+            <tbody>
+              {% for announce in announces %}
+              <tr>
+                <td>{{ announce.content | replace("<span class=\"mark\">「系统公告」</span>", "")}}</td>
+                <td>{{ announce.senderName }}</td>
+                <td>{{ announce.createdAt | dateFilter('yyyy年MM月dd日 hh:mm:ss') }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

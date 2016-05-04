@@ -16,7 +16,7 @@
       {% if error %}
       <span class="error">{{ error }}</span>
       {% endif %}
-      <form class="form-horizontal m-t-20" action="/login" method="post">
+      <form id="form" class="form-horizontal m-t-20" action="/login" method="post">
         <div class="form-group ">
           <div class="col-xs-12">
             <input class="form-control" type="text" required="" name="username" placeholder="输入用户名" autofocus="">
@@ -54,5 +54,21 @@
 </div>
 
 {% include "admin/common/footer.html" %}
+<script>
+  $(function() {
+    $('#form').submit(function(e) {
+      e.preventDefault();
+      var data = $('form').serialize();
+      $.ajax({ url: '/login', method: 'post', data: data})
+          .success(function(data) {
+            if (data.code == 0) {
+              location.href = '/admin'
+            } else {
+              $app.notify(data.msg);
+            }
+          })
+    })
+  })
+</script>
 </body>
 </html>

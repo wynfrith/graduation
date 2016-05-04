@@ -12,7 +12,7 @@ const assert = chai.assert;
 
 let user;
 
-describe.only('test qa', () => {
+describe('test qa', () => {
 
   before(async () => {
     mongoose.connect('mongodb://localhost/newQA');

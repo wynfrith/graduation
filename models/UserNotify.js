@@ -12,7 +12,9 @@ const UserNotifySchema = new Schema({
   id: { type: ObjectId },
   isRead: { type: Boolean, default: false },
   userId: { type: ObjectId },
-  notifyId: { type: ObjectId }
+  notifyId: { type: ObjectId },
+  notifyType: { type: String },
+  content: { type: String }
 }, {versionKey: false});
 
 UserNotifySchema.plugin(timestamp);

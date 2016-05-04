@@ -2,6 +2,7 @@ import Router from 'koa-router';
 import UserService from '../services/UserService';
 import QaService from "../services/QaService";
 import TagService from "../services/TagService";
+import NotifyService from '../services/NotifyService'
 import CommentService from '../services/CommentService'
 
 import koaJwt from 'koa-jwt'
@@ -343,7 +344,14 @@ router.post('/user/answer', async (ctx) => {
   const user = await UserService.getUserById(ctx.state.user.id);
   const {answer, qid} = ctx.request.body;
   const res = await QaService.createAnswer(answer, qid, user);
-  if(res.code != 0) return ctx.body = { code: 1, msg: '发表回答失败,请重新尝试', errors: res.errors};
+  if(res.code != 0) {
+    return ctx.body = { code: 1, msg: '发表回答失败,请重新尝试', errors: res.errors};
+  }
+  // 为所有订阅该答案的人创建通知
+  NotifyService.createRemind(res.data.questionId, 'question', user._id, 'answer',
+    `<a href="#!/u/${user.username}">${user.username}</a> 回答了问题 <a href="#!/q/${res.data.questionId}">`);
+  // 订阅问题
+  NotifyService.subscribe(ctx.state.user._id,res.data.questionId, 'question');
   ctx.body = res;
 });
 
@@ -361,7 +369,11 @@ router.post('/user/question', async (ctx) => {
   const user = await UserService.getUserById(ctx.state.user.id);
   const {tagStr, content, title} =ctx.request.body;
   const res = await QaService.createQuestion(title, content, tagStr.split(';'), user);
-  if(res.code != 0) return ctx.body = { code: 1, msg: '发表问题失败,请重新尝试', errors: res.errors};
+  if(res.code != 0) {
+    return ctx.body = { code: 1, msg: '发表问题失败,请重新尝试', errors: res.errors};
+  }
+  // 订阅这个问题
+  NotifyService.subscribe(ctx.state.user._id,res.data._id, 'question');
   ctx.body = res;
 });
 
@@ -375,10 +387,26 @@ router.post('/user/vote', async (ctx) => {
 });
 
 
-// 评论
 
-// 修改头像
+// 拉取通知
+router.post('/user/pullNotify', async (ctx) => {
+  await Promise.all([
+    NotifyService.pullAnnounce(ctx.state.user.id),
+    NotifyService.pullRemind(ctx.state.user.id)
+  ]);
+  ctx.body = ''
+});
 
+// 获取用户通知列表
+router.get('/user/notifies', async (ctx) => {
+  ctx.body = await NotifyService.getUserNotify(ctx.state.user.id);
+});
+
+// 设为已读
+router.post('/user/notifies/read', async (ctx) => {
+  const { nid } = ctx.request.body;
+  ctx.body = await  NotifyService.readNotify(nid);
+});
 
 
 

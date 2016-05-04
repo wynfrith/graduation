@@ -4,6 +4,7 @@
 import Subscription from '../models/Subscription'
 import Notify from '../models/Notify'
 import UserNotify from '../models/UserNotify'
+import {SaveError, NotFoundError, Ok} from "../utils/error";
 
 class NotifyService {
 
@@ -95,7 +96,11 @@ class NotifyService {
   }
 
   static async readNotify (nid) {
-    await UserNotify.findOneAndUpdate({_id: nid}, { isRead: true});
+    try {
+      return Ok(await UserNotify.findOneAndUpdate({_id: nid}, { isRead: true}))
+    } catch(err) {
+      return SaveError(err);
+    }
   }
 
 }

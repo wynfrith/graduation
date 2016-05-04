@@ -1,4 +1,4 @@
-var mailer = require('nodeMailer')
+var mailer = require('nodemailer')
 
 import cfg from '../config'
 

@@ -6,7 +6,9 @@ import {
   list as qList,
   remove as removeQuestion
 } from '../controllers/QaController'
+
 import AnnounceCtrl from '../controllers/AnnounceController'
+import StatisticCtrl from '../controllers/StatisticController'
 
 const router = new Router({ prefix: '/admin'});
 
@@ -29,6 +31,8 @@ router.post('/question/remove', removeQuestion);
 
 router.get('/announce', AnnounceCtrl.list);
 router.post('/announce', AnnounceCtrl.post);
+
+router.get('/statistics/user', StatisticCtrl.userStatistic)
 
 
 export default router;

@@ -82,7 +82,7 @@ if(path.resolve('index.js') === module.parent.filename){
   mongoose.set('debug', true);
   mongoose.connect('mongodb://localhost/newQA');
 
-  app.listen(3000, () => console.log('server started http://localhost:3000'));
+  app.listen(3000, '0.0.0.0', () => console.log('server started http://localhost:3000'));
 }
 
 

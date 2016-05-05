@@ -9,6 +9,7 @@ const Ok = (data) => {
 
 // 保存或更新出错
 const SaveError = (err) => {
+  console.log(err);
   let errors = [];
   if (err.errors) {
     for(let [key, value] of Object.entries(err.errors)) {

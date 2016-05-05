@@ -39,7 +39,6 @@ router.get('/q/recommends', async (ctx) => {
 
 // 获取问题和所属的答案
 router.get('/question/:id', async (ctx) => {
-  let q = await QaService.getQuestionById(ctx.params.id);
   let [question, answers] =await Promise.all([
     QaService.getQuestionById(ctx.params.id),
     QaService.getAnswersByQuestion(ctx.params.id)
@@ -126,18 +125,19 @@ router.get('/search', async (ctx) => {
   let limit = +ctx.query.limit || 10;
   let page = +ctx.query.page;
   let result, count;
+  let text = ctx.query.text.trim();
   switch (ctx.query.type) {
     case 'question':
-      [result, count] = await QaService.searchQuestions(ctx.query.text, {page: page, limit: limit});
+      [result, count] = await QaService.searchQuestions(text, {page: page, limit: limit});
       break;
     case 'user':
-      [result, count]= await UserService.searchGeneralUsers(ctx.query.text,{page: page, limit: limit});
+      [result, count]= await UserService.searchGeneralUsers(text,{page: page, limit: limit});
       break;
     case 'tag':
-      [result, count] = await TagService.searchTags(ctx.query.text,{page: page, limit: limit});
+      [result, count] = await TagService.searchTags(text,{page: page, limit: limit});
       break;
     default:
-      [result, count] = await QaService.searchQuestions(ctx.query.text,{page: page, limit: limit});
+      [result, count] = await QaService.searchQuestions(text,{page: page, limit: limit});
   }
   ctx.body = {
     result: result,

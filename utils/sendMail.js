@@ -4,6 +4,7 @@ import cfg from '../config'
 
 var transporter = mailer.createTransport({
   service: cfg.mail.service,
+  host: cfg.mail.host,
   auth: {
     user: cfg.mail.user,
     pass: cfg.mail.pass

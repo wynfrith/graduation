@@ -77,9 +77,9 @@ class NotifyService {
   }
 
   // 拉取公告
-  static async pullAnnounce(userId) {
+  static async pullAnnounce(userId, createTime) {
     const last = await UserNotify.findOne({userId: userId}).sort({createdAt: -1});
-    let filter = { type: 'announce'};
+    let filter = { type: 'announce', createAt: {  $gt: createTime }};
     if (last) filter['createdAt'] = {  $gt: last.createdAt };
     // console.log(last.createdAt);
     // const notifies = await Notify.find(filter);

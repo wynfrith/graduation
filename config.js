@@ -3,10 +3,11 @@ export default {
   secret: 'wynfrith',
   
   mail: {
-    user: '1252264267@qq.com',
-    pass: 'wfc5582563@126..',
+    user: 'wynfrith@tom.com',
+    pass: 'wfc5582563',
     name: 'Wynfrith的毕设',
-    service: 'QQ',
+    // service: 'QQ',
+    host: 'smtp.tom.com',
     callbackUrl: 'http://127.0.0.1:3000/verify'
   },
 

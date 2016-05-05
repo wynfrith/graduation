@@ -412,8 +412,9 @@ router.post('/user/vote', async (ctx) => {
 
 // 拉取通知
 router.post('/user/pullNotify', async (ctx) => {
+  const user = await UserService.getUserById(ctx.state.user.id);
   await Promise.all([
-    NotifyService.pullAnnounce(ctx.state.user.id),
+    NotifyService.pullAnnounce(ctx.state.user.id, user.createdAt),
     NotifyService.pullRemind(ctx.state.user.id)
   ]);
   ctx.body = await NotifyService.getReadNotifyCount(ctx.state.user.id);

@@ -1,4 +1,6 @@
 import Router from 'koa-router';
+import UserService from "../services/UserService";
+import QaService from "../services/QaService";
 
 import { list as uList ,detail as uDetail, ban,unBan, remove as uRemove } from '../controllers/UserController'
 import { list as tagList, add as addTag, remove as removeTag, edit as editTag } from '../controllers/TagController'
@@ -12,7 +14,21 @@ import StatisticCtrl from '../controllers/StatisticController'
 
 const router = new Router({ prefix: '/admin'});
 
-router.get('/', async (ctx) => { await ctx.render('admin/index')});
+router.get('/', async (ctx) => {
+  let [views ,uCount, qCount, aCount] = await Promise.all([
+    QaService.getViews(),
+    UserService.getUsersCount(),
+    QaService.getQuestionCount(),
+    QaService.getAnswerCount()
+    ]);
+  await ctx.render('admin/index', {
+    visitors: ctx.app.userCount || 0,
+    views: views,
+    uCount: uCount,
+    qCount: qCount,
+    aCount: aCount
+  })
+});
 
 
 router.get('/user', uList);

@@ -7,6 +7,20 @@ import {SaveError, NotFoundError, Ok} from "../utils/error";
 
 const QaService = {
   // 除了对qa的增删改查, 还包括点踩, 采纳等特殊操作
+  getQuestionCount: async () => {
+    return await Qa.count({isDel:false, type: true});
+  },
+  getAnswerCount: async () => {
+    return await Qa.count({isDel:false, type: false});
+  },
+  getViews: async () => {
+    let num = 0;
+    let qas = await Qa.find({isDel: false, type: true}, {views: 1});
+    for(let qa of qas) {
+      num += qa.views;
+    }
+    return num;
+  },
   
   createQuestion: async (title, content, tagArray, user) => {
     const question = new Qa({

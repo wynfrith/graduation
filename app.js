@@ -20,7 +20,6 @@ import auth from './middlewares/auth'
 
 import dateFilter from './utils/filters/dateFilter'
 import session from 'koa-generic-session'
-// import redisStore from 'koa-redis'
 import MongoStore from 'koa-generic-session-mongo'
 
 
@@ -77,12 +76,27 @@ app.use(apiRouter.routes())
 app
   .use(adminRouter.routes());
 
+
+var server = require('http').Server(app.callback()),
+  io = require('socket.io')(server);
+
+
+io.on('connection', function(socket){
+  app.userCount =  app.userCount || 0;
+  app.userCount += 1;
+  console.log('当前在线人数  ', app.userCount);
+  console.log('.............socket.io................');
+  socket.on('disconnect',function(){
+    app.userCount -= 1;
+    console.log('当前在线人数  ', app.userCount);
+  });
+});
+
 // app start
 if(path.resolve('index.js') === module.parent.filename){
   mongoose.set('debug', true);
   mongoose.connect('mongodb://localhost/newQA');
-
-  app.listen(3000, '0.0.0.0', () => console.log('server started http://localhost:3000'));
+  server.listen(3000, '0.0.0.0', () => console.log('server started http://localhost:3000'));
 }
 
 

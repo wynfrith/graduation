@@ -1,7 +1,102 @@
 {% extends "admin/layout.html" %}
 
+
 {% block content %}
 
-施工中..........
+
+<div class="row">
+  <div class="col-sm-12">
+    <h4 class="page-title">控制台</h4>
+    <p class="text-muted page-title-alt">{{ u.username }},您好. 欢迎来到后台管理页面</p>
+    <p  class="text-custom "> 当前在线人数 : <span class="text-custom" style="font-size: 20px;">{{ visitors }} </span></p>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-lg-3">
+    <div class="card-box">
+      <div class="bar-widget">
+        <div class="table-box">
+          <div class="table-detail">
+            <div class="iconbox bg-info">
+              <i class="icon-paper-plane"></i>
+            </div>
+          </div>
+
+          <div class="table-detail">
+            <h4 class="m-t-0 m-b-5"><b>{{ views }}</b></h4>
+            <h5 class="text-muted m-b-0 m-t-0">浏览量</h5>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="col-lg-3">
+    <div class="card-box">
+      <div class="bar-widget">
+        <div class="table-box">
+          <div class="table-detail">
+            <div class="iconbox bg-success">
+              <i class="icon-people"></i>
+            </div>
+          </div>
+
+          <div class="table-detail">
+            <h4 class="m-t-0 m-b-5"><b>{{ uCount }}</b></h4>
+            <h5 class="text-muted m-b-0 m-t-0">用户量</h5>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3">
+    <div class="card-box">
+      <div class="bar-widget">
+        <div class="table-box">
+          <div class="table-detail">
+            <div class="iconbox bg-custom">
+              <i class="icon-bubble "></i>
+            </div>
+          </div>
+
+          <div class="table-detail">
+            <h4 class="m-t-0 m-b-5"><b>{{ qCount }}</b></h4>
+            <h5 class="text-muted m-b-0 m-t-0">问题数</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3">
+    <div class="card-box">
+      <div class="bar-widget">
+        <div class="table-box">
+          <div class="table-detail">
+            <div class="iconbox bg-pink">
+              <i class="icon-note "></i>
+            </div>
+          </div>
+
+          <div class="table-detail">
+            <h4 class="m-t-0 m-b-5"><b>{{ aCount }}</b></h4>
+            <h5 class="text-muted m-b-0 m-t-0">回答数</h5>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+</div>
+
 
 {% endblock %}

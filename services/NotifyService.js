@@ -11,7 +11,6 @@ class NotifyService {
   static async subscribe (userId, target, targetType) {
     await Subscription.findOneAndUpdate(
       {uid: userId, target: target, targetType: targetType},
-      {uid: userId, target: target, targetType: targetType},
       {upsert: true}
     );
   }

@@ -35,7 +35,7 @@ app.use(convert(koaJwt({ secret: cfg.secret}).unless({ path: [
   // 主页
   '/', '/verify', '/login','/logout', /^\/admin/,
   // 静态文件
-  /^\/css/, /^\/js/, /^\/images/, /^\/third/, /^\/upload/, /^\/frontend/, '/favicon.ico',
+  /^\/css/, /^\/js/, /^\/images/, /^\/third/, /^\/upload/, /^\/public\/frontend/, '/favicon.ico',
   // 不需要验证的api接口
   /^\/api\/(?!user\/)/
 ]})));
